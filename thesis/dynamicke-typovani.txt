@@ -1,0 +1,82 @@
+Přechod od striktně typových jazyků jako je Java nebo C# k jazykům, které využívají dynamické typování, může být pro někoho matoucí až frustrující. Jedná se o přechod ze světa, kde má každá proměnná určený datový typ do světa, ve kterém proměnná datový typ nemá, protože datový typ se určuje až podle hodnoty, na kterou proměnná odkazuje. Někdy se mylně tvrdí, že Ruby není silně typový jazyk, protože není třeba explicitně definovat datové typy. Tento výrok, ale mísí dohromady dva různé termíny. Na jedné straně je třeba od sebe odlišovat jazyky typované staticky a dynamicky. Na druhé straně je třeba odlišovat jazyky typované silně a slabě.
+
+Statické nebo dynamické typování se liší podle toho, kdy dochází k vyhodnocování informace o datovém typu. Při statickém typování je datový typ objektu znám již při překladu. Při dynamickém typování dochází k vyhodnocení datového typu až za běhu programu. Důsledkem tohoto přístupu nemají datový typ proměnné, ale hodnoty. U dynamicky typovaných jazyků je tedy datový typ určen pouze hodnotou, která je v proměnné uložena. To je důvod, proč může jedna a ta samá proměnná v různých částech programu představovat hodnoty různých datových typů.
+
+Ruby je dynamický, silně typovaný jazyk. Ruby není o nic méně typovaný jazyk než Java. V Ruby datové typy existují a jediný rozdíl spočívá v tom, že nemusejí být deklarovány. Navíc jsou tyto datové typy velice silně dodržovány. Deklarace datových typů nemá se slabým či silným typováním nic společného. V programovacích jazycích, ve kterých jsou datové typy dodržovány slabě lze například provést tento zápis, který neskončí chybou:
+
+<pre class='nomargin'><textarea class='code'>
+2 + '2' #=> '22'
+</textarea></pre>
+
+Konkrétně tento zápis i s tímto výsledkem lze provést v Javascriptu. V Ruby podobný zápis chybou skončí. Tento příklad ukazuje základní rozdíl mezi slabě a silně typovými jazyky. V Ruby ani v Javascriptu není třeba definovat datové typy a přesto Ruby na jejich dodržování trvá a Javascript nikoliv.
+
+Někdy bývá jako argument, který svědčí pro jazyky s deklarativním typováním, že jsou tyto jazyky méně chybové a hodí se tak pro větší a robustnější aplikace. Čas, ale sám ukázal, že tomu tak není a že Ruby není hračkou pouze pro skupinu nadšenců nebo pro projekty malé velikosti. Obavy z větší chybovosti se nenaplnily, a pokud se Ruby programátorů zeptáte, jak často mají problém s tím, že by program skončil chybou kvůli špatnému datovému typu, velice pravděpodobně odpoví, že snad někdy. Z velké části je to také dané kulturou psaní kódu, v níž se preferují krátké metody, které jsou natolik průhledné, že v nich lze udělat chybu v typování jen velice obtížně. Druhým aspektem je pak využití testování, kdy se testování kódu nebere jako možnost, ale jako povinnost.
+
+
+###Duck typing
+
+Duck typing je vlastnost jazyka, která vychází z toho, že není nutné deklarovat žádné datové typy. V Ruby (a v ostatních jazycích, ve kterých není deklarace datových typů povinná) se k objektům nepřistupuje na základě jejich datového typu, ale na základě vlastností, nebo lépe řečeno, na základě metod, na jejichž volání umí odpovědět. Duck typing se řídí heslem: pokud vypadá jako kachna a chodí jako kachna, pak to bude kachna. Objekt je tak posuzován pouze na základě svých vlastností.
+
+Staticky typované jazyky lze přirovnat k aristokracii. Pořád se totiž pracuje s rodokmenem objektu a s tím, kdo byli předkové, prapředkové a tak dále. Aplikace se rozhoduje na základě původu objektu. Pokud staticky typované jazyky přirovnáme k aristokracii, pak dynamicky typované jazyky můžeme přirovnat k meritokracii1. Každý objekt je posuzován pouze na základě svých schopností a nikoliv původu. Je důležité, co objekt umí a ne z jakého rodokmenu pochází.
+
+###Třídy nejsou datové typy
+
+Využití přístupu, kterému se postupem času začalo říkat duck typing vyžaduje jiný způsob přemýšlení a tím pádem i jiný způsob psaní programů. Na začátku je důležité si uvědomit, co je to datový typ. Běžně se za datový typ pokládá třída. Ale i Java jakožto staticky typovaný jazyk nám ukazuje, že datovým typem nemusí být vždy třída. Vezměme následující příklad:
+
+<pre class='nomargin'><textarea class='code'>
+Customer customer;
+customer = database.findCustomer("porazil");
+</textarea></pre>
+
+Výše uvedený Java kód říká, že proměnná customer, je datového typu Customer. Znamená to ovšem, že proměnná customer je datového typu Customer a ten odpovídá třídě Customer? Nemusí tomu tak být, protože Customer může být rozhraní a pak datovým typem není třída, ale právě rozhraní.
+
+V Ruby nic takového jako rozhraní nenajdeme. Jak již bylo řečeno, tak Ruby využívá duck typing a tak jsou v něm objekty posuzovány pouze na základě svých vlastností. To je důvod proč rozhraní v Ruby ani není potřeba. Představme si situaci, kdy máme metodu, která akceptuje jeden parametr. Z důvodu absence statického typování nevíme při psaní programu, jaký má argument datový typ a s ohledem na duck typing na tom ani nezáleží. Není totiž důležité, jestli argument odpovídá datovému typu, který jsme očekávali, ale zda má definovány metody, které voláme. Ke zjištění, zda objekt dokáže reagovat na zaslání konkrétní zprávy, slouží metoda respond_to?:
+
+#start#
+class MyClass
+  def greet
+    puts 'Hello world'
+  end
+end
+
+my_class = MyClass.new
+my_class.respond_to? :greet #=> true
+my_class.respond_to? :say_hello #=> false
+#stop#
+
+
+Na následujícím příkladu si ukážeme praktické využítí duck typingu. Našim cílem bude implementovat triviální překladač z češtiny do libovolného jazyka. Do jakého jazyka bude překladač překládat, bude záležet na poskytnutém překládacím stroji.
+
+#start#
+class Translator
+  def initialize(translator_engine)
+    @translator_engine = translator_engine
+  end
+  def translate(word)
+    @translator_engine.process(word)
+  end
+end
+
+class PirateEngine
+  DICTIONARY = { 'ahoj' => 'ahoy' }
+  def process(word)
+    DICTIONARY[word]
+  end
+end
+
+class EnglishEngine
+  DICTIONARY = { 'ahoj' => 'hello' }
+  def process(word)
+    DICTIONARY[word]
+  end  
+end
+
+pirate_translator = Translator.new(PirateEngine.new)
+english_translator = Translator.new(EnglishEngine.new)
+
+pirate_translator.translate('ahoj') #=> ahoy
+english_translator.translate('ahoj') #=> hello
+#stop#
+
+
+Instance třídy Translator má definovánu jedinou metodu translate. Tato metoda zavolá na poskytnutém překládacím stroji metodu process. U překládacího stroje nezáleží na datovém typu, ale pouze na tom, zda dokáže reagovat na metodu process.

@@ -1,0 +1,46 @@
+Zatím bylo o Ruby jako o jazyku pojednáváno hlavně v obecné rovině. Pouze v náznacích byly zmíněny některé základní vlastnosti jazyka. Tato část by tedy měla dát v krátkosti odpověď na to, co je Ruby za jazyk. Kam ho můžeme zařadit v souvislosti s ostatními programovacími jazyky. 
+
+Ruby je interpretovaný skriptovací jazyk, který se zaměřuje na objektově orientované programování. Je inspirován a vychází z programovacích jazyků Perl, Smalltalk, Eiffel, Ada a Lisp. Kombinuje v sobě přístupy funkcionálního a imperativního programování. Dvě předchozí věty v krátkosti vystihují podstatu programovacího jazyka Ruby. O jejich srozumitelnosti by se však dalo diskutovat. Postupně si zde tedy rozebereme čtyři hlavní termíny, které Ruby popisují.
+
+###Skriptovací jazyky
+
+Popsat skriptopvací jazyky může být těžší, než se zdá. Neexistuje totiž žádná ucelená definice toho, co je to skriptovací jazyk. Tvůrci skriptovacích jazyků se o tuto definici moc nezajímají a raději řeší pratktické problémy. Když byl dotázán tvůrce Perlu Larry Wall, ať popíše skriptovací jazyky, odpověděl v nadsázce: *„… Scénář je něco, co dáte hercům. Program je to, co vám přitáhne diváky.“*<sup>1</sup> [[Prechelt2002]](/diplomova-prace/pouzita-literatura#sections) Skriptovací jazyky jsou tak spíš posuzovány podle svých vlastností, než aby se daly zaškatulkovat podle přesné definice. Skriptovacími jazyky jsou kromě Ruby například PHP, Perl, Python nebo JavaScript. Typické vlastnosti skriptovacích jazyků jsou pak [[Prechelt2002]](/diplomova-prace/pouzita-literatura#sections):
+
+* Obvykle je není nutné překládat a ve většině případů obsahují interaktivní interpret jazyka.
+* Obsahují pouze takové množství příkazů, které jsou bezpodmínečně nutné. Snaží se programátora odstínit od všech nepotřebných věcí, tak aby se co nejvíce maximalizovala efektivita.
+* Zejména podporují automatickou správu paměti. Funkcionalita usnadňující práci je zabudována přímo v jazyku a nenachází se v externích knihovnách.
+* Neobsahují silnou typovou kontrolu.
+
+###Interpretované jazyky
+
+Programovací jazyky se dělí na dvě základní kategorie z hlediska typického zpracování počítačem1. Na jednom konci spektra se nachází jazyky interpretované, na druhém konci spektra stojí překládané jazyky. Nic ale není černobílé a tak existují i způsoby zpracování, které jsou někde na půli cesty. Interprety některých jazyků tak používají i techniku překladu. Pokud bychom chtěli pro přehlednost způsoby zpracování roztřídit do kategorií, mohly by dané kategorie vypadat následovně:
+
+######Zdrojový kód aplikace je zpracován přímo
+Příkladem těchto interpetů je unixový shell nebo COMMAND.COM. Výhodou je jednoduchost, nevýhodou naopak rychlost zpracování.
+
+######Zdrojový kód je přeložen do efektivnějšího mezikódu a ten je následně zpracován
+Tuto techniku využívají například jazyky Ruby, Python nebo Perl.
+
+######Zpracován je už předem přeložený kód
+Předem přeloženému kódu se většinou říká bytecode. Tento postup je typický například pro Javu. Výhodou je, že bytecode není ještě strojový kód a tak je nezávislý na platformě. Jeden a ten samý kód, tak může být spuštěn na jakékoliv platformě, pro kterou existuje JVM (Java Virtual Machine). JVM je tedy v podstatě interpret bytecodu do strojového kódu dané platformy. JVM můžeme jako interpret označit o to víc, že v poslední době se využívá tzv. princip just-in-time compilation, který překládá bytecode průběžně až za běhu aplikace.
+
+######Zdrojový kód je přeložen přímo do strojového kódu
+To je případ například typické implementace jazyka C. Pomocí překladače (kompilátoru), je zdrojový kód převeden rovnou do strojového kódu, který je zavislý na konkrétní architektuře.
+
+###Imperativní programování
+
+Imperativní programování je jedno ze základních programovacích paradigmat. Protipólem k imperativnímu programování je programování deklarativní. Imperativ znamená rozkaz nebo rozkazovací způsob a je tedy zřejmé, že imperativní programování se skládá z řady příkazů. Tento způsob komunikace je člověku velice blízký. Můžeme ho nalézt v různých příručkách, jako jsou kuchařky nebo jiné doporučené postupy. Velice často tak také probíhá komunikace mezi rodičem a dítětem nebo zaměstnavatelem a zaměstnancem.
+
+Imperativní programovcí jazyky jsou tedy charakteristické tím, že program má tvar posloupnosti příkazů, které ve výsledku tvoří algoritmus řešení. Charakteristická pro toto paradigma je změna stavu. Stav se v průběhu programu udržuje v proměných a jejich obsah je měněn operací přiřazení. Dalšími typickými příkazy jsou pak kromě přiřazení ještě cykly a příkazy pro větvení. Prvními imperativními programovacími jazyky byly strojové jazyky jednotlivých počítačů. V současné době mezi představitele můžeme zahrnout všechny jazyky, které vyznávají objektově orientovaný přístup, jako například C++, Java, Python, Perl a Ruby.
+
+###Funkcionální programování
+
+Funkcionální programování je podmnožinou deklarativního programování. Typické pro deklarativní programování je, že narozdíl od imperativního programování, neříká, jak se co má udělat, ale naopak říká, co se má udělat. Programátor nepopisuje algoritmus řešení, ale popisuje to, jak má vypadat výsledek. Programování v těchto jazycích se poté tedy neskládá z instrukcí, které se mají postupně provádět, ale z výčtu vlastností, které má výsledek splňovat. Zpravidla ani nezáleží na pořadí podmínek, protože kód nebývá zpracován lineárně (postupně), jako jsme na to zvyklí z imperativních programovacích jazyků. Deklarativní programovací jazyky se dělí na funkcionální, logické, na jazyky s omezujícími podmínkami a na jazyky, které jsou specializované pouze na určitou doménu, jako například jazyk SQL.
+
+Základem funkcionálních programovacích jazyků je teorie funkcí, lambda-kalkul. K programu je přistupováno jako k matematickému výrazu, kde pomocí funkcí popisujeme, co chceme vypočíst, a to, jak se výpočet bude provádět, není podstatné. *„Funkciolnální programovací jazyky jsou třídou jazyků, které odrážejí matematické smýšlení lidí a technologii, která je za vším skryta, nechávají v pozadí“* [[Goldberg1996]](/diplomova-prace/pouzita-literatura#sections). Teorie kolem funkcionálního programování vznikla ještě před masovým rozšířením počítačů a má ji na svědomí profesor matemaiky Alonzo Church, který působil na Prinston University. K jeho nejznámějším vědeckým přínosům patří Church-Turingova teze o tom, že algoritmus je ekvivaltentní pojmu funkce. Není určitě bez zajímavosti, že Alan Turing, jedno z nejvýznamnějších jmen v historii informatiky, působil u Churche jako doktorand.
+
+Funkcionálnímu programování se také někdy říká programování bez přiřazení. V čistě funkcionálních jazycích operace přiřazení jednoduše neexistuje. Mnoho algoritmů má v těchto jazycích elegantnější zápis a dovoluje se dívat na problém z úplně jiné perspektivy. Funkcionální programování se například využívá při programování umělé inteligence. Mezi typické představitele této rodiny jazyků patří Haskell, Scheme a Lisp.
+
+<hr />
+
+<sup>1</sup> Anglické slovo script v češtině mimo jiné odpovídá výrazu scénář, proto je možná tato slovní hříčka, kterou Larry Wall popsal skriptovací jazyky.

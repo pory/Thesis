@@ -1,0 +1,47 @@
+!!! 5
+%html
+  %head
+    %meta{ 'http-equiv' => 'Content-Type', :content => 'text/html;charset=utf-8' }
+    %title= "porazil.net"
+    %link{ :href => '/favicon.png', :type => "image/png", :rel => "icon" }    
+    %script{ :type => "text/javascript", :src => "/codemirror/lib/codemirror.js" }
+    %script{ :type => "text/javascript", :src => "/codemirror/mode/python/python.js" }
+    %script{ :type => "text/javascript", :src => "/javascripts/jquery.js" }
+    %script{ :type => "text/javascript", :src => "/javascripts/jquery-ui.js" }
+    %script{ :type => "text/javascript", :src => "/javascripts/application.js" }
+    %link{ :href => '/stylesheets/reset.css', :type => "text/css", :media => "screen", :rel => "stylesheet" }
+    %link{ :href => '/stylesheets/960.css', :type => "text/css", :media => "screen", :rel => "stylesheet" }
+    %link{ :href => '/stylesheets/text.css', :type => "text/css", :media => "screen", :rel => "stylesheet" }
+    %link{ :href => '/stylesheets/style.css', :type => "text/css", :media => "screen", :rel => "stylesheet" }
+    %link{ :href => '/codemirror/lib/codemirror.css', :type => "text/css", :media => "screen", :rel => "stylesheet" }
+    %link{ :href => '/codemirror/theme/default.css', :type => "text/css", :media => "screen", :rel => "stylesheet" }
+  %body
+    %img{ :src => "/images/beta.png", :alt => "stránky jsou ve výstavbě", :class => "beta-marker" }
+    #page{ :class => "container_16" }
+      #wrapper{ :class => "grid_14 prefix_1 suffix_1" }
+        #header
+          %a{ :href => "/", :title => "porazil.net" }
+            %img{ :src => "/images/logo.png", :alt => "porazil.net" }
+          #navigation-bar
+        .clear
+        #content
+          = yield
+    .clear
+    #footer
+      .container_16
+        #footer-wrapper{ :class => "grid_14 prefix_1 suffix_1" }
+          #copyright-left 
+            %p
+              Copyright &copy; 2010 porazil.net, Tomáš Porazil. <strong>Inspirovat se, nekopírovat.</strong>
+          #copyright-right
+            .socials
+              %a{ :href => "http://twitter.com/pory", :title => "odkaz na twitter" }
+                %img{ :src => "/images/twitter.png" }
+              %a{ :href => "http://www.last.fm/user/pory85", :title => "odkaz na last.fm" }
+                %img{ :src => "/images/lastfm.png" }
+              %a{ :href => "http://foursquare.com/user/3552641", :title => "odkaz na foursquare" }
+                %img{ :src => "/images/foursquare.png" }
+              %a{ :href => "http://cz.linkedin.com/in/porazil", :title => "odkaz na linkedin" }
+                %img{ :src => "/images/linkedin.png" }
+              %a{ :href => "http://www.flickr.com/photos/pory/", :title => "odkaz na flicker" }
+                %img{ :src => "/images/flickr.png" }

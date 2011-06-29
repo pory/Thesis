@@ -1,0 +1,10 @@
+Problém při studiu programovacích jazyků, ať už z papírových učebnic, akademických prací nebo z článků na internetu, je absence jakékoli interaktivity. Je dokázáno, že pokud si člověk může ihned vyzkoušet nově nabyté znalosti, osvojí si je v kratším čase a zapamatuje si je na delší dobu. Strmá učící křivka je kýžený stav, kterého chceme dosáhnout. Pojednává-li práce o programovacích jazycích, byla by škoda nevyužít jejich síly a neumožnit čtenáři, aby si ihned osvojil tématiku, o které se právě dočetl.
+
+Jedním z hlavních výstupů této práce je interaktivní webová aplikace, která představuje elektronickou verzi této práce. Hlavní předností aplikace není pouze převod diplomové práce do podoby webových stránek, ale již zmíněná interaktivita. V kapitolách, které pojednávají o programování, se nachází velké množství ukázek kódu a tyto ukázky je možné si v aplikaci přímo zkusit. Čtenář tak má možnost, vyzkoušet si, zda popisovanou problematiku pochopil správně a zda jím napsaný kód dělá přesně to, co by od něj očekával. Aplikace tak představuje cestu, jak dosáhnout okamžité zpětné vazby. Aplikace je umístěna na adrese:
+
+**[http://porazil.net/diplomova-prace](http://porazil.net/diplomova-prace)**
+
+Nebývá zvykem ihned v úvodu akademické práce prezentovat výstupy, ke kterým se při zpracování došlo. Tento výstup je však natolik zásadní, že může ovlivnit vnímání celé práce. Webová aplikace přináší oproti klasicky psané práci (ať už vytištěné či v elektronické podobě) nový rozměr a snaží se ukázat, jakým směrem je možné se vydat při výuce programovacích jazyků.
+
+Aplikace je napsána v jazyku Ruby, s využitím již v úvodu zmíněného micro-frameworku Sinatra. Inspirací pro napsání aplikace byla aplikace [Try Ruby](http://tryruby.org), která se snaží Ruby atraktivní formou přiblížit začátečníkům. Zdrojový kód aplikace je součástí této práce jako přílohy a současně je umístěn na serveru GitHub na adrese [http://github.com/pory/thesis](http://github.com/pory/thesis).
+

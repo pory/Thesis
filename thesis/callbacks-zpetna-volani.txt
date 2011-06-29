@@ -1,0 +1,118 @@
+Ruby kromě klasického imperativního stylu umožňuje programování s využitím zpětných volání. Zpracování programu pak neprobíhá lineárně, ale dochází k nelineárním přeskokům, které na první pohled nemusí být plně postřehnutelné. Zpětná volání se obvykle spouštějí jako reakce na určité jasně definované události. K většímu přiblížení, co může být těmito událostmi a jak může zpětné volání vypadat, si můžeme ukázat na frameworku Ruby on Rails. Zpětná volání se zde hojně využívají při práci s databází, kdy můžeme definovat události a následné akce, které se mají provést. Konkrétně můžeme například definovat událost: before_save na kterou navážeme vlastní metodu, která odpovídá akci, která se má provést. Událost before_save se vyvolá před každým uložením daného modelu do databáze a my tak ještě před uložením můžeme model upravit, aby například ukládané telefonní číslo bylo v mezinárodním formátu, pokud v něm již není. Zpětná volání tak představují velice elegantní řešení, jak se vypořádat s problémy podobnéhu typu.
+
+Konkrétně zpětné volání v podobě before_save je specifické pro Ruby on Rails. Není to funkcionalita, která by byla zabudována přímo v samotném jazyku. Příklad sloužil hlavně k přiblížení toho, co se pod pojmem zpětná volání ukrývá. Nicméně i Ruby má definována svoje zpětná volání, která se hojně využívají. Jedná se o metody, které reagují na události, které jsou spojeny s vytvářením nebo úpravou tříd a modulů. Zde je nekompletní přehled těch nejvyužívanějších zpětných volání, která se v Ruby vyskytují [alHabache2008b]:
+
+* method_missing
+* const_missing
+* included
+* extended
+* method_added
+* singleton_method_added
+* method_removed
+* singleton_method_removed
+* inherited
+
+Názvy jednotlivých metod jsou se znalostí angličtiny samovysvětlující a nepotřebují dalších komentářů. Protože se tyto metody využívají v kódu velice podobným způsobem, na příkladu si ukážeme použití pouze jedné z nich. Bude to metoda method_missing a to hlavně z toho důvodu, že toto zpětné volání se stalo mezi Ruby programátory jedno z nejpopulárnějších a nejvíce využívaným.
+
+###Method missing
+
+Zpětné volání method_missing se spouští vždy, když voláme metodu, která neexistuje. Vždy, když zasíláme objektu zprávu v podobě volání metody, interpret se podívá do definice třídy, zda třída tuto metodu obsahuje. Jestliže třída neobsahuje implementaci dané metody, pak se spustí zpětné volání method_missing, což konkrétně znamená, že se interpret opět podívá do definice třídy, ale tentokrát hledá metodu s názvem method_missing. Pokud třída neobsahuje ani metodu method_missing program skončí chybou NoMethodError.
+Představme si třídu, která slouží k míchání barev. Tato třída obsahuje jednu jedinou metodu mix, která z poskytnutých barev dokáže namixovat výslednou barvu. Kód třídy ColorMixer, která by poskytovala danou funkcionalitu, by mohl vypadat například takto:
+
+#start#
+class ColorMixer
+  def mix(*colors)
+    colors = colors.flatten
+    if colors.empty?
+      raise ArgumentError.new(
+        "You have to provide at least one color.")
+    elsif colors.size == 1
+      return puts "The resulting color is #{colors.first}."
+    end
+    return puts "The resulting color will
+                 consist from: #{colors.join(' and ')}."
+  end
+end
+#stop#
+
+
+Z kapitoly 2.12.2 Libovolný počet argumentů víme, že hvězdička (*) před názvem parametru znamená, že se s parametrem bude pracovat jako s polem. To znamené, že i pokud metodě mix neposkytneme pole, ale pouze jednotlivé barvy oddělené čárkou, pole z nich bude vytvořeno automaticky. Problém ale může nastat, pokud bychom jako parametr použili pole. Potom by parametr colors obsahoval dvě pole v sobě a právě k vyřešení tohoto problému slouží metoda flatten. Flatten dokáže z pole odstranit všechna zanořená pole:
+
+#start#
+my_array = ["a", "b", ["c", "d"]]
+my_array.flatten #=> ["a", "b", "c", "d"]
+#stop#
+
+
+Zbylé řádky metody mix zajišťují již pouze kontrolu parametrů a výpis pomyslně namíchaných barev na obrazovku. Použití třídy ColorMixer je pak možné následujícím způsobem:
+
+#start#
+color_mixer = ColorMixer.new
+color_mixer.mix("blue", "red")
+#=>The resulting color will consist from: blue and red.
+#stop#
+
+
+Použití metody mix tímto způsobem je klasické a standardní. Nebylo by to ale Ruby, kdyby nenabízelo ještě jinou cestu, kterou bychom se při míchání barev mohli vydat. Představte si situaci, kdy by bylo možné, zadat barvy, které chceme smíchat rovnou do názvu metody. Metoda mix by pak mohla mít následující podobu:
+
+#start#
+color_mixer.mix_blue_and_red
+#stop#
+
+
+Pokud nyní zkusíme tuto metodu zavolat, program skončí chybou NoMethodError. Nyní již přichází čas pro využití zpětného volání method_missing. Jak jsme si již říkali, pokud interpret nenalezne ve třídě danou metodu, v našem případě metodu mix_blue_and_red, pak se pokusí nalézt metodu method_missing. Když, ale interpret nenalezne ani metodu method_missing, program skončí chybou. Nyní je tedy potřeba implementovat metodu method_missing ve třídě ColorMixer:
+
+#start#
+class ColorMixer
+  def method_missing(id, *args, &block)
+    method = id.to_s
+    if method =~ /^mix_/
+      return mix(method.sub('mix_', '').split('_and_'))
+    end
+    raise NoMethodError
+  end
+end
+#stop#
+
+
+Metoda má tři parametry. Prvním parametrem, který je v tomto případě označen jako id, je název metody, který je předáván jako symbol. Následuje pole parametrů (args), které představuje parametry, se kterými byla volána metoda, jejíž název se ve třídě nepodařilo nalézt. Posledním parametrem je block kódu (block). Naše nově vymyšlená metoda nemá žádné parametry a proto při implementaci metody method_missing je pro nás významný pouze první parametr, který odpovídá názvu metody.
+
+Implementace metody method_missing má obecně následující logiku. Pomocí regulárního výrazu se porovná název metody s daným vzorem. Pokud se nalezne shoda s některým se vzorů (v našem případě je jen jeden), pak dochází k dalšímu zpracování. V opačném případě metoda vyhodí výjímku NoMethodError, stejně tak, jako kdyby žádná naše implementace metody method_missing neexistovala.
+
+Konkrétně v našem případě se název metody porovnává s regulárním výrazem /^mix/, který říká, že by daný řetězec měl začínat řetězcem mix_. Pokud tomu tak je, pak se z názvu metody odstraní řetězec mix_ a zbylá část se rozdělí na pole dle oddělovače, který tvoří řetězec _and_. Tímto způsobem jsou z názvu metody separovány jednotlivé barvy a následně je zavolána původní metoda mix. Nyní je již tedy možné použít následující zápis:
+
+#start#
+color_mixer.mix_blue_and_red
+#=> The resulting color will consist from: blue and red.
+#stop#
+
+
+Při použití zpětného volání v podobě method_missing, je potřeba nezapomenout na jednu zásadní věc. Je zapotřebí ovědomit si, že použitím této techniky do třídy v podstatě přidáváme nové metody. Instance by měla proto vracet hodnotu true jako odpověď na metodu respond_to?, ve které je jako paramater název metody, kterou řešíme využitím method_missing. Jinými slovy, aby byl výše uvedený příklad kompletní je zapotřebí předefinovat metodu respond_to?, tak aby výsledek této metody odpovídal realitě. V současné podobě totiž tomu tak není, jak se můžeme přesvědčit:
+
+#start#
+color_mixer = ColorMixer.new
+color_mixer.mix_blue_and_red
+#=> The resulting color will consist from: blue and red.
+color_mixer.respond_to?(:mix_blue_and_red) #=> false
+#stop#
+
+Instance třídy ColorMixer dokáže reagovat na metodu mix_blue_and_red, ale metoda respond_to? říká něco jiného. Tuto nekonzistenci můžeme vyřešit překrytím metody respond_to? ve třídě ColorMixer:
+
+#start#
+class ColorMixer
+  def respond_to? method
+    return true if method.to_s =~ /^mix_/
+    return super(method)
+  end
+end
+#stop#
+
+
+Nyní je již vše v naprostém pořádku, o čemž se můžeme i sami přesvědčit:
+
+#start#
+color_mixer = ColorMixer.new
+color_mixer.mix_blue_and_red
+#=> The resulting color will consist from: blue and red.
+color_mixer.respond_to?(:mix_blue_and_red) #=> true
+#stop#

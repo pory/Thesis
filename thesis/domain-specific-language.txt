@@ -1,0 +1,349 @@
+Tento termín lze doslovně přeložit jako doménově specifický jazyk, avšak běžně se tento termín nepřekládá a využívá se jeho zkratka DSL. V následujícím textu se budeme na tento termín odkazovat také převážně touto zkratkou. Martin Fowler DSL definuje jako „počítačový jazyk, který se zaměřuje na řešení úzce vymezených problémů, v kontrastu s obecnými programovacími jazyky, které dokáží řešit veškeré problémy s vývojem softwaru“ [Fowler2010]. Mezi nejznámnější představitele DSL patří kaskádové styly (CSS), regulární výrazy, SQL a mezi ty méně známé ale určitě ne méně významné například rake, make, Haml a svým způsobem i třeba webový framework Ruby on Rails.
+
+Z příkladů konkrétních DSL si již můžeme udělat lepší představu o tom, co se za tímto termínem ukrývá. Jedná se o jazyky, které byly vytvořeny, aby co možná nejvíce přímočaře dokázaly posloužit k úkolu, pro který byly vytvořeny. Preferuje se snadnost použití a elegantní syntaxe. V mnohých případech (můžeme říci, že ve většině) se ani nejedná o kompletní programovací jazyk dle Alana Turinga. Není to ani cílem těchto jazyků. Jejich cílem je, aby se co nejvíce hodily k řešení problémů, které souvisí s velice úzkou oblastí. V případě CSS je to adresování prvků a definice pravidel pro vzhled, v případě SQL je to kladení dotazů do databáze. Díky tomu, že jsou DSL zaměřeny pouze na úzkou oblast (nepopisuje celý systém), je možné zaměřit se pouze na konkrétní problém a veškerá nepotřebná data nechat stranou. Tato vlastnost umožnuje, aby byly DSL stručné a syntakticky přehledné.
+
+DSL mohou být definovány přímo v jazyku, ve kterém jsou používány. DSL se pak stávají nadstavbou daného programovacího jazyka. Můžeme říci, že takto definované DSL tvoří jazyky v jazyku. Do programovacího jazyka jsou přidávána nová syntaktická pravidla, která tvoří DSL. Takto definovaným DSL se říká interní. Naproti tomu existují externí DSL, které jsou nezávislé na programovacím jazyku. Externí DSL mohou existovat samostatně napříč různými systémy a různými programovacími jazyky. Typické vlastnosti externích a interních DSL jsou shrnuty v následujících bodech:
+
+Externí DSL
+
+* Představuje svůj vlastní svět se svými syntaktickými i sémantickými pravidly.
+* Nezávislý na programovacím jazyku a díky tomu je možné definovat syntaxi, která se přesně hodí k řešení problémů v dané oblasti.
+* Protože DSL nevychází z žádného programovacího jazyku, ale je postaven na svých vlastních základech je nutné pro jeho použití napsat vlastní parser (pokud již není v daném jazyku napsaný).
+* Problematická podpora v integrovaných vývojových prostředích (IDE).
+
+Interní DSL
+
+* Omezení pouze na syntaxi jazyka, ve kterém je definován (omezení daná možnostmi jazyka).
+* DSL je definováno v daném programovacím jazyce, je v něm i zpracováno a proto není nutné psát nový parser.
+* Omezené využití v rozšířených programovacích jazycích jako je Java nebo C#, díky jejich syntaktickým pravidlům1.
+* Představuje syntaktické rozšíření jazyka, které v extrémním případě umožňuje vývoj aplikace pouze prostřednitvím DSL bloků. DSL v tomto případě slouží jako vrstva s ještě vyšší mírou abstrakce, než jakou poskytuje programovací jazyk.
+
+###Language Oriented Programming
+
+Pojem, který se velice úzce pojí s interními DSL je Language Oriented Programming. Termín můžeme volně interpretovat jako programování za pomoci jazyka. Tento přístup využívá a navazuje na principy, na kterých stojí DSL. Celá myšlenka je velice prostá a vychází ze základního předpokladu, že při vývoji systému se v první fázi vyvine DSL, který systém popisuje, a v druhé fázi se systém staví pomocí již vytvořeného DSL. Výhodou takto navrženého systému je snadné prototypování nových částí, rychlejší vývoj a flexibilnější reakce na změny. Toto vše je dosaženo především díky velice úspornému kódu, kterého je dosaženo využitím DSL. Nezanedbatelnou výhodou je i čitelnost takovýchto systémů, kdy je za předpokladu dobře navrženého DSL, kódu schopen porozumět i neprogramátor. Toto není důležité z hlediska toho, že bychom chtěli psát kód, kterému by rozumněli i lidé, kteří neprogramují, ale z důvodů, které dobře vystihuje Martin Fowler [Fowler1999]: „Kód, kterému rozumí počítač, umí napsat každý trouba. Dobří programátoři píší kód, kterému rozumí lidé“. Tato myšlenka byla v této práci už jednou zmíněna, avšak k tomuto tématu se hodí tak dobře, že by byla škoda ji opomenout. Pokud vás více zajímá téma Language Oriented Programming lze nalézt více informací v [Ward1994], kde byl tento termín zmíněn vůbec poprvé.
+
+Webový framework Ruby on Rails, který je postaven na programovacím jazyku Ruby představuje typický systém, ve kterém je využit princip Language Oriented Programming a tím pádem i DSL. Ne nadarmo se o Rails říká, že se nejedná o nic jiného než o DSL, které je postaveno na Ruby. Nám teď právě tento framework poslouží jako figurant, na kterém si konečně ukážeme co to vlastně DSL je. Podívejte se na následující příklad:
+
+<pre class='nomargin'><textarea class='code'>
+class Person < ActiveRecord::Base
+  validates_presence_of :name
+end
+</textarea></pre>
+
+Person je klasická Ruby třída, která je potomkem ActiveRecord::Base1. Na prvním řádku tohoto příkladu není nic zajímavého, zajímavý je ale už hned druhý řádek. Metoda validates_presence_of, která slouží ke kontrole, zda je objekt platný (validní). Třída Person tuto metodu podědila od svého předka ActiveRecord::Base. Metoda nám říká, že aby byl objekt platný, musí mít vyplněné jméno (atribut name). Metoda validates_presence_of je typickou ukázkou využití DSL v praxi. Nejedná se totiž o metodu, která by byla definována standardně v jazyku, ale je definována až pomocí daného jazyka.
+
+Již na tomto jednoduchém příkladě si lze povšimnout, že to jak lze interní DSL implementovat je velice závislé na použitém programovacím jazyku. Na první pohled totiž není patrné, že metoda validates_presence_of je skutečně metoda a už vůbec ne, že se jedná o metodu třídy. Výše uvedenou definici třídy bychom mohli přepsat takto:
+
+<pre class='nomargin'><textarea class='code'>
+class Person < ActiveRecord::Base
+  self.validates_presence_of(:name)
+end
+</textarea></pre>
+
+Tento zápis je už samozřejmě mnohem méně elegantní a také mnohem méně čitelný. Dokazuje to ovšem jednu zásadní věc a tou je fakt, že interní DSL se nejlépe tvoří v jazycích, které mají flexibilní syntaxi. Důležité vlastnosti programovacích jazyků, které jsou vhodné pro tvorbu interních DSL lze shrnout do následujích třech bodů (poslední dva body budou představeny a obhájeny v následujících podkapitolách):
+
+* Flexibilní syntaxe, která dovoluje opomenout závorky kolem argumentů metod a vůbec využívá závorek co nejméně.
+* Implementace closures.
+* Implementace technik podporujících metaprogramování.
+
+###Interní DSL v Ruby
+
+DSL vyšlo v předchozích kapitoléch poměrně do detailu probráno, avšak doposud jsme se pohybovali pouze v oblasti teorie. Toto by se nyní mělo změnit. Implementaci interního DSL v Ruby si ukážeme rovnou na příkladu. Ne nadarmo se říká, že příklad mnohdy vystačí za tisíc slov a v tomto případě s tímto tvrzením nelze než souhlasit.
+
+Představme si, že programujeme aplikaci, ve které se ve velkém množství pracuje s budovami, neboli s objekty, které reprezentují budovy. Budovy se skládají z pater, patra obsahují místnosti a u místností evidujeme jejich rozlohu. Z tohoto krátkého popisu je patrné, že se v aplikaci budou vyskytovat tři základní objekty, které reprezentují budovu, patro a místnost. V aplikaci se tedy budou vyskytovat třídy Building, Floor a Room. Naším cílem je navrhnout interní DSL, které by usnadňovalo tvorbu budov, tak abychom vždy nemuseli vytvářet instance jednotlivých objektů a ty poté kombinovat dohromady do výsledné budovy. Po zralé úvaze jsme navrhli DSL, které vyhovuje našim požadavkům a v něm zapsaný program má následující podobu:
+
+<pre class='nomargin'><textarea class='code'>
+family_house = BuildingCreator.build 'Family house'  do
+  floor do
+    room 'kitchen', :area => 30
+    room 'dining room', :area => 20
+    room 'living room', :area => 40 
+  end
+  floor do
+    room 'bed room', :area => 40
+    room 'bed room', :area => 30
+    room 'bathroom', :area => 20      
+  end
+end
+</textarea></pre>
+
+Ke stavbě našeho pomyslného domu využíváme ve velké míře bloky kódu, které tvoří přehlednou a kompaktní syntaxi. I bez sebemenšího vysvětlení je patrné, co daným kódem chceme říci. Máme v úmyslu vytvořit dům, který se bude jmenovat Family house a který bude mít dvě patra. V prvním patře budou tři místnosti a ve druhém patře budou jen dvě místnosti. U každé z místností definujeme její název a také rozlohu.
+
+Jaká je výhoda v použití DSL? Vytvořit budovu, která by splňovala předchozí požadavky lze samozřejmě i s použitím klasického konstruktoru a pomocí běžných metod. Pro srovnání si ukážeme, jak by takový zápis mohl vypadat:
+
+<pre class='nomargin'><textarea class='code'>
+family_house = Building.new('Family house')
+
+first_floor = Floor.new(1)
+first_floor.rooms << Room.new('kitchen', :area => 30)
+first_floor.rooms << Room.new('dining room', :area => 20)
+first_floor.rooms << Room.new('living room', :area => 40)
+
+family_house.floors << first_floor
+
+second_floor = Floor.new(2)
+second_floor.rooms << Room.new('bed room', :area => 40)
+second_floor.rooms << Room.new('bed room', :area => 30)
+second_floor.rooms << Room.new('bathroom', :area => 20)
+
+family_house.floors << second_floor
+</textarea></pre>
+
+Srovnáme-li dva předchozí příklady, které v zásadě dělají stejnou věc, je na první pohled jasné, proč se užití DSL stalo natolik populární. Jen na takto jednoduchém příkladu lze vidět, o kolik je zápis jednodušší a kratší. Když posléze vezmeme v úvahu, že v kratším kódu je s vysokou pravděpodobností i méně chyb, můžeme tvrdit, že zápis pomocí DSL je i méně chybový. Tento druhý příklad nám ukazuje ještě jinou věc. Velice podobně by vypadal kód třeba v Javě (pokud si přimyslíme ještě středníky na konci řádků). Tento zápis totiž nevyužívá vlastností Ruby, pro které je tak oblíbené a dobře čitelné, jako je možnost psát metody bez závorek nebo využití bloků kódu.
+
+####Implementace
+
+Ještě než se pustíme do implementace našeho DSL, musíme si definovat jednotlivé třídy. Třídy Building, Floor a Room, by měli být na DSL absolutně nezávislé, tak aby je bylo možné použít i běžným způsobem. To znamená vytvořit budovu a její části klasicky pomocí kontruktorů. To, jestli byla budova správně vytvořena a odpovídá našim požadavkům, budeme kontrolovat pomocí textové reprezentace třídy Building. Po zavolání metody puts na instanci třídy Building, se automaticky vypisuje její textová reprezentace, která je daná metodou to_s. My budeme chtít předefinovat metodu to_s tak, abychom dostali textový výstup odpovídající textovému popisu domu, pater a místností v něm obsažených. Textový výpis ukázkové budovy by vypadal takto:
+
+<pre class='nomargin'><textarea class='code'>
+puts family_house
+#=> Family house has 2 floor(s).
+#=> Floor 1 has 3 room(s): kitchen (30), dining room (20), living room (40).
+#=> Floor 2 has 3 room(s): bed room (40), bed room (30), bathroom (20).
+</textarea></pre>
+
+Samotný text je samovysvětlující a za vysvětlení stojí pouze čísla, která jsou uvedená v závorkách za jednotlivými názvy místností. Čísla v závorkách udávají rozlohu dané místnosti.
+
+Implementace tříd, jejichž instance budou tvořit budovu, nebude příliš komplexní, ba právě naopak - bude spíše triviální. Každá třída bude mít pouze dvě metody, initialize (kontruktor) a metodu to_s (textová reprezentace třídy). Každá třída bude mít také definovány přístupové metody ke svým atributům tak, aby k nim mohlo být jednak přistupováno zvnějšku třídy a také, aby bylo možné změnit jejich hodnotu. Implementace tříd Building, Floor a Room vypadá takto:
+
+#start#
+class Building
+  attr_accessor :name, :floors
+  
+  def initialize(name)
+    @name = name
+    @floors = []
+  end
+  
+  def to_s
+    result = "#{@name} has #{@floors.size} floor(s).\n"
+    @floors.each do |floor|
+      result << floor.to_s
+    end
+    return result
+  end
+end
+
+class Floor
+  attr_accessor :number, :rooms
+  
+  def initialize(number)
+    @number = number
+    @rooms = []
+  end
+  
+  def to_s
+    result = "Floor #{@number} has #{@rooms.size} room(s): "
+    result << @rooms.map { |room| room.to_s }.join(', ') + ".\n"
+  end
+end
+
+class Room
+  attr_accessor :type, :area
+  
+  def initialize(type, options = {})
+    @type = type
+    @area = options[:area]
+  end
+  
+  def to_s
+    "#{type} (#{area})"
+  end
+end
+#stop#
+
+
+Daleko zajímavější než implementace tříd Building, Floor nebo Room, je implementace modulu BuildingCreator. Tento modul je zodpovědný za interpretaci námi vymyšleného DSL. Pokud se podíváme zpět na DSL, zjistíme, že se v něm objevují pouze tři metody. Jedná se o metody build, floor a room. U metody build by jistě každý poznal, že se jedná o metodu, ale u metod floor a room, to již stoprocentně tvrdit nelze. Jak už jsme jednou uváděli, je tomu tak proto, že pokud jsou metody uvedeny bez závorek, budí dojem spíše klíčových slov než metod. Tato vizuální vlastnost, nebo můžeme říci klamání zevnějškem, je přesně ta vlastnost, kterou u metod chceme využít. Chceme, aby naše metody vypadaly jako klíčová slova.
+
+Jak již bylo řečeno BuildingCreator je modul. Nejedná se tedy o třídu, jak bychom možná očekávali. Využití modulu se v tomto případě přímo nabízí, protože nepotřebujeme, aby mohl BuildingCreator vytvářet své vlastní instance, ale potřebujeme pouze, aby dokázal inicializovat a pracovat s ostatními třídami. V podstatě se jedná pouze o obálku, která sdružuje metody (kód) do jednoho celku. Nejdříve se podíváme na implementaci modulu a poté si vysvětlíme jeho jednotlivé části:
+
+#start#
+module BuildingCreator
+
+  def self.build(name, &block)
+    building = Building.new(name)
+    building.instance_eval(&block)
+    return building
+  end
+  
+  Building.class_eval do
+    define_method :floor do |&block|
+      floor = Floor.new(@floors.size + 1)
+      floor.instance_eval(&block)
+      @floors << floor
+    end
+  end
+  
+  Floor.class_eval do
+    define_method :room do |type, options|
+      @rooms << Room.new(type, options)
+    end
+  end
+  
+end
+#stop#
+
+
+BuildingCreator obsahuje pouze jednu jedinou metodu a to je metoda build. Ta tedy zároveň tvoří rozhraní, pomocí něhož lze s modulem pracovat. Protože modul nemůže vytvářet své instance, je metoda build definována jako metoda třídy (nebo v tomto případě modulu). Metoda build akceptuje dva parametry, u nichž prvním je název budovy, kterou chceme vytvořit (name), a druhým parametrem je blok kódu (&block). S bloky kódu jako parametry metod jsme se už setkali a tak to pro nás není ničím novým. Novinkou ovšem je, jak je tento blok kódu dále zpracován. Blok kódu je zpracován metodou instance_eval, která nás přivádí do světa metaprogramování. Kromě metody instance_eval, se v modulu objevily ještě nám neznámé metody class_eval a define_method, které také souvisí s metaprogramováním. Metaprogramování představuje v Ruby poměrně rozsáhlou oblast, kterou určitě není možné pokrýt v rozsahu této práce. Avšak protože je tento přístup pro Ruby natolik typický, je třeba ho alespoň částečně zmínit. V následující kapitole tedy budou mimo jiné vysvětleny metaprogramovací postupy, které se objevily v modulu BuildingCreator a také představeny některé další.
+
+###Metaprogramování
+
+Dříve než budeme pokračovat ve vysvětlování našeho příkadu, je důležité objasnit, co to vlastně metaprogramování znamená. Pokud jste o něm nikdy dřív neslyšeli, pak se nenechte zmýlit, že se jedná o termín, který se pojí jen s Ruby. Metaprogramování je technika, která je známá už velice dlouhou dobu a v různých jazycích je více či méně použitelná. To, že se o metaprogramování mluví často ve spojitosti s Ruby, není náhoda. Ruby se pro metaprogramování hodí více než dobře, ale to neznamená, že je to jediný jazyk, ve kterém lze tuto techniku uplatnit.
+
+A co to tedy metaprogramování je, nebo co tento termín znamená? Velice krátkou a srozumitelnou definici můžeme nalézt v [Why2005], kde se autor o metaprogramování vyjadřuje jako o „psaní kódu, který píše kód“. Tato definice je velice široká a spadají do ní například i generátory kódu. Každý kód, který dokáže vytvářet další kód, bychom tak mohli považovat za metaprogramování. Pro naše účely, ale tuto definici poněkud zúšíme. Tentokráte si půjčíme definici z [Perrotta2010], kde je metaprogramování definováno následovně: „Metaprogramování je psaní kódu, který dokáže za běhu aplikace manipulovat s konstrukty jazyka“. Tato definice už bohužel není tak srozumitelná, ale mnohem více vystihuje, co budeme my považovat za metaprogramování. Důležité je v této definici zdůraznění, že k manipulacím s jazykem dochází za běhu programu. Zde je základní rozdíl mezi generátory kódu, které generují fyzický kód, kdežto metaprogramováním se tento kód generuje (vytváří) pouze v paměti a nikde fyzicky neexistuje. Metaprogramování se pak díky otevřeným třídám v Ruby používá například k úpravě definic tříd až za běhu programu.
+
+####Reflexe
+
+Reflexe je pojem, který se pojí velice úzce s metaprogramováním. Jazyk, ve kterém se píší metaprogramy se nazývá metajazyk. Pokud jazyk dokáže být zároveň svým metajazykem, můžeme o něm říci, že má schopnost reflexe. Ruby je přesně tento typ jazyku. Když píšeme kód, který manipuluje s programem za běhu aplikace, nepotřebujeme k tomu žádný jiný programovací jazyk, ale vystačíme si pořád jen s Ruby. Ruby je tedy zároveň svým vlastním metajazykem.
+
+Nyní, když známe základní termíny, se můžeme vrátit zpět k našemu příkladu. Techniku, kterou jsme v těle modulu BuildingCreator použili, byla právě technika reflexe. Pojďme se nyní podívat blíže na metodu build:
+
+#start#
+def self.build(name, &block)
+  building = Building.new(name)
+  building.instance_eval(&block)
+  return building
+end
+#stop#
+
+
+Metoda build akceptuje dva paremtry, z nichž prvním je název budovy (name) a druhým je blok kódu (&block). Nejdříve vytvoříme instanci třídy Building, které předáme název budovy. Nyní chceme vytvořit patra a místnosti, které má dům, tak jak jsme ho v našem DSL definovali, obsahovat. Inormace o patrech a o místnostech se nyní ukrývají v bloku kódu. V této chvíli je důležité si uvědomit, co parametr &block obsahuje a jakým způsobem s ním můžeme dále pracovat:
+
+<pre class='nomargin'><textarea class='code'>
+floor do
+  room 'kitchen', :area => 30
+  room 'dining room', :area => 20
+  room 'living room', :area => 40 
+end
+floor do
+  room 'bed room', :area => 40
+  room 'bed room', :area => 50      
+end
+</textarea></pre>
+
+Výše je uveden blok kódu, který je obsažen v parametru &block. V této podobě je blok kódu předán jako argument do metody instance_eval, která je zavolána na instanci třídy Building. Metoda instance_eval vyhodnocuje řetězec, který obsahuje kód nebo blok kódu v kontextu svého adresáta (příjemce) [Thomas2004]. Pokud vám není jasné, co tato metoda dělá, pak nezoufejte. Jinými slovy to znamená, že instance_eval vyhodnotí blok kódu a výsledek zašle jako zprávu instanci building. V našem případě bude instanci building zaslána zpráva (metoda) floor, která bude mít jako argument blok kódu. Pokud to ani nyní není jasné, podívejte se následující kus kódu:
+
+<pre class='nomargin'><textarea class='code'>
+building.instance_eval(&block)
+</textarea></pre>
+
+Kód výše je interně za běhu programu vyhodnocen do následujcí podoby:
+
+<pre class='nomargin'><textarea class='code'>
+building.floor do
+  room 'kitchen', :area => 30
+  room 'dining room', :area => 20
+  room 'living room', :area => 40 
+end
+</textarea></pre>
+
+Vše tedy nakonec končí voláním metody floor na instanci building. Nyní ale nastává druhý problém. Pokud si ještě vzpomínáte na implementaci třídy Building, tak ta žádnou metodu floor neobsahovala. Nyní jsme měli na výběr dvě možnosti. První možností bylo doplnit do definice třídy Building metodu floor. Tím by ale modul BuildingCreator byl závislý na vnitřní implementaci třídy Building a navíc by třída obsahovala metodu, kterou by využíval pouze námi definovaný modul. Rozhodli jsme se tedy pro druhou možnost a tou je, že metodu floor do třídy Building doplníme, ale až za běhu programu. Využili jsme otevřenosti tříd v Ruby a dynamicky za běhu programu jsme do třídy doplnili novou metodu instance. Přidání metody floor do třídy Building je vyjádřeno následujícím kusem kódu:
+
+#start#
+Building.class_eval do
+  define_method :floor do |&block|
+    floor = Floor.new(@floors.size + 1)
+    floor.instance_eval(&block)
+    @floors << floor
+  end
+end
+#stop#
+
+
+Metoda class_eval je velice podobná metodě s instance_eval. Rozdíl spočívá v tom, že class_eval vyhodnocuje řetězec nebo blok, které přijámá jako parametry, v kontextu modulu1. Metoda se používá například pro přidávání metod do tříd. class_eval také umožňuje volání privátních metod třídy. Obou těchto vlastností je využito právě v našem příkladu. Pomocí soukromé metody define_method jsme dynamicky do třídy přidali novou metodu. Jak již název metody napovídá, define_method slouží k definici instanční metody v adresátovi. Jako parametry slouží symbol, který odpovídá názvu nové metody a block kódu nebo funkce (instance třídy Proc nebo Method), které představují tělo metody. Když si odmyslíme v našem příkladu metodu class_eval, tak si lze představit použití define_method takto:
+
+<pre class='nomargin'><textarea class='code'>
+class Building    
+  define_method(:floor) do |&block|
+    floor = Floor.new(@floors.size + 1)
+    floor.instance_eval(&block)
+    @floors << floor
+  end
+end
+</textarea></pre>
+
+Toto použití přesně odpovídá také následujícímu zápisu:
+
+<pre class='nomargin'><textarea class='code'>
+class Building    
+  def floor(&block)
+    floor = Floor.new(@floors.size + 1)
+    floor.instance_eval(&block)
+    @floors << floor
+  end
+end
+</textarea></pre>
+
+Můžeme vidět, že pomocí metod class_eval a instance_method jsme byli schopni to třídy Bulding dynamicky za běhu programu přidat metodu floor, kterou bychom jinak do třídy zapsali, tak jak je vidět v poslední ukázce. Stejným postupem je do třídy Room přidána až za běhu programu metoda floor, tento postup zde již tedy nebudeme rozebírat. Uvedenému postupu, v němž jsou metody do tříd přidávány, až za běhu programu se říká Monkey Patching. Označuje se tak hlavně postup, kdy jsou za běhu aplikace měněny staticky definované třídy.
+
+####Dynamické volání metod
+
+Pokud jsme se zmínili o metodách class_eval a instance_eval, musíme se alespoň krátce zmínit také o metodě eval. Zde se dostáváme na pomezí reflexe a dynamického volání metod. Protože ale budeme metodu eval porovnávat spíše s konstrukcemi, které se používají pro dynamické volání metod, byla právě do této sekce metoda eval zařazena.
+
+Dle [Thomas2004] eval vyhodnocuje Ruby výraz, který mu byl poskytnut v podobě řetězce. Tuto definici lze interpretovat tak, že eval vyhodnocuje řetězec jako jakýkoliv jiný výraz v Ruby. Síla této metody spočívá v tom, že lze dynamicky vytvořit výraz v podobě řetězce a ten následně nechat vyhodnotit metodou eval. Podívejte se na následující příklady, po jejichž shlédnutí bude snad vše jasnější:
+
+#start#
+eval "2 + 3" #=> 5
+eval "def plus(a, b); a + b; end"
+eval "plus(2, 3)" #=> 5
+#stop#
+
+
+Metoda eval může být vyhodnocována i v jiném kontextu, než je volána. Pro poskytnutí kontextu, slouží druhý, nepovinný parametr této metody. Ukázku a podrobnější vysvětlení lze nalézt v [alHabache2008], kde lze nalézt mimo jiné i další přiklady týkající se reflexe v Ruby.
+
+Připomeňme si jen v krátkosti, jakým způsobem se v Ruby volají metody instancí. Vezmeme si jednoduchý řetězec a zavoláme na něj metodu pro zjištění jeho délky length:
+
+#start#
+"This is my string".length #=> 17
+#stop#
+
+
+Pro zjištění délky řetězce jsme řetězci zaslali zprávu length a jako odpověď jsme dostali délku řetězce, v tomto případě číslo, které odpovídá sedmáncti znakům. Důležité je všimnout si, že jsme objektu zaslali zprávu. Právě na tomto principu je postavená druhá metoda, která se používá pro dynamické volání metod. Jedná se o obecnou metodu send, která má jako parametry název volané metody a její případné parametry. Její využití si ukážeme opět na zjištění délky řetězce:
+
+#start#
+"This is my string".send(:length) #=> 17
+#stop#
+
+
+Pro ukázku, jak lze metodu send využít i pro volání metody, která má nějaké parametry, zašleme řetězci zprávu o tom, zda obsahuje slovo string:
+
+#start#
+"This is my string".send(:include?, "string") #=> true
+#stop#
+
+
+Třetí cestou, jak lze v Ruby dynamicky zavolat metodu, je pomocí techniky, kdy z metody nejdříve uděláme instanci třídy Method, na které následně zavoláme metodu call. Říká se, že všechno v Ruby je objekt a tak lze i metody převést do objektové podoby, konkrétně do instancí třídy Method. Metody lze v této podobě předávat jako argumenty do ostatních metod, ale tím se zde zabývat nebudeme. Pouze to vypichujeme jako informaci, která by mohla zapadnout.
+
+Pojďme se nyní podívat, jakým způsobem lze využít instanci třídy Method k dynamickému volání metod:
+
+#start#
+method_length = "This is my string".method(:length)
+method_length.call #=> 17
+#stop#
+
+
+Použití stejného postupu v případě volání metody, která obsahuje argument:
+
+#start#
+method_include = "This is my string".method(:include?)
+method_include.call("string") #=> true
+#stop#
+
+
+Dynamické volání metod má i své stinné stránky. Flexibilita, kterou tyto techniky poskytují, je vykoupena především pomalým zpracováním. Při přemýšlení nad tím, jakou z uvedených technik ve svém programu použít, je třeba vždy zvážit výkonnostní hledisko. Především zpracování metody eval je řádově pomalejší, než ostatní dva způsoby. Rychlost zpracování jednotlivých příkazů můžeme demonstrovat na příkladu, který byl převzat z [Thomas2004]:
+
+
+#start#
+require "benchmark" 
+string = "This is my string" 
+n = 100000 
+Benchmark.bmbm {|x| 
+  x.report("send") { n.times { string.send(:length) } } 
+  x.report("call") { n.times { string.method(:length).call } }  
+  x.report("eval") { n.times { eval "string.length" } } 
+}
+#=>        user       system     total    real
+#=> send   0.016000   0.000000   0.016000 (0.015000)
+#=> call   0.047000   0.000000   0.047000 (0.056003)
+#=> eval   0.749000   0.000000   0.749000 (0.754043)
+#stop#

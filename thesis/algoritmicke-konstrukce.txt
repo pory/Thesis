@@ -1,0 +1,132 @@
+Imperativní programování se neobejde bez příkazů, pomocí kterých lze měnit průchod aplikací v závislosti na jejich stavu. Typickými programátorskými pomůckami jsou větvení a opakování. Stejně jako Java, tak i Ruby obsahuje celou řadu příkazů, které slouží pro rozhodování, kterým směrem se má aplikace při svém běhu ubírat. V této části práce budou představeny ekvivalenty Javovských konstrukcí if-then, if-then-else, switch, for, while, do-while, tak jak se zapíší v jazyku Ruby. Některý příkazy byly použity již v příkladech v předchozích částech této práce, zde budou ale představeny obšírněji a probrány do větších detailů.
+
+###Příkazy pro větvení (if, unless, elsif, case)
+
+Stejně jako Java i Ruby používá klasický příkaz if. Rozdíl v syntaxi je patrný hned na první pohled, protože v Ruby se nepoužívají k oddělení kontextu složené závorky, ale místo nich se k ukončení příkazu if používá klíčové slovo end.
+
+#start#
+sandwich = 'tommatos, cheese, salad, salami, egg'
+if sandwich.include? 'egg'
+  puts 'I do not eat eggs!'
+else
+  puts 'Yum! Yum!'
+end 
+#=> I do not eat eggs!
+#stop#
+
+
+Výše uvedený výraz sandwich.include? 'egg' je vyhodnocen jako pravdivý, pokud proměnná sandwich obsahuje řetězec 'egg'. Metoda include? vrací true, pokud řetězec obsahuje daný řetězec nebo znak. Nenechte se zmást otazníkem, který je součastí názvu metody. Otazník na konci metody je jmennou konvencí, kterou se označují metody, které vrací hodnoty true nebo false. Více se můžete o metodách dočíst v kapitole 2.12  Metody.
+
+Příkaz if lze v Ruby použít i bez klíčového slova end. V takovém případě se nejdříve uvádí výraz a až poté příkaz if s podmínkou, která se má vyhodnotit. Výhodou podobné syntaxe je, že mnohem více připomíná lidskou řeč (anglickou větu). V odborné literatuře se této konstrukci, kdy je podmínka až za výrazem, říká modifikátor výrazu1. Tento zápis se využívá hlavně pro svou kompaktní syntaxi, v které namísto třech řádků kódu, napíšeme jen jeden:
+
+#start#
+puts 'It is really hot!' if temperature > 30
+#stop#
+
+
+Kromě klasického příkazu if Ruby obsahuje ještě jeho velice blízkého příbuzného, příkaz unless. Tento příkaz není nic jiného, než negovaný příkaz if, ale je pozoruhodné, jakým způsobem dokáže tato jednoduchá konstrukce zpřehlednit kód. Pokud bychom to převedli do normální řeči, tak když někde v kódu uvedeme příkaz if, říkáme tím: Když je to pravda, proveď tento příkaz. Příkaz unless dělá přesný opak. Programu tím říkáme: Jestliže to není pravda, proveď tento příkaz. Použití tohoto příkazu vede k čistšímu zápisu podmínky, ve které se nemusí využívat operátor pro negaci:
+
+#start#
+sentence = 'Stop or I will shoot!'
+unless sentence.include? '?'
+  puts 'This sentence is not a question.'
+end 
+#=> This sentence is not a question.
+#stop#
+
+
+Příkaz unless, ale může v nesprávných rukou vést i k hůře čitelnému kódu, dalo by se říci až kryptografickému. Chris Whamond uvádí tři nejčastější chyby při použití tohoto příkazu [Whamond2010]:
+
+* Snažit se vždy použít pouze jednu podmínku (neřetězit podmínky pomocí operátoru &&).
+* Nepoužívat negace, unless je negací už sám o sobě.
+* Nikdy nepoužívat větev else, podmínka se tak stává skoro nečitelnou.
+
+Stejného výsledku by šlo dosáhnout i použitím příkazu if. Musel by být ovšem použit operátor pro negaci, který by otočil logiku výrazu v podmínce a ta by se tak stala méně čitelnou:
+
+#start#
+sentence = 'Stop or I will shoot!'
+if !sentence.include? '?'
+  puts 'This sentence is not a question.'
+end
+#=> This sentence is not a question.
+#stop#
+
+
+Velice často se stává, že program potřebujeme dělit na více než na dvě větve. Příkaz if nám umožňuje směrovat chod programu pouze na základě jedné podmínky (podmínky mohou být samozřejmě řetězeny pomocí logických spojek AND a OR, ale ve výsledku výraz tvoří pouze jednu podmínku). Nic ve světě není pouze černobílé. Co tedy dělat napříkad v situaci, kdy nám nestačí zodpovědět pouze otázku, jestli je den nebo noc, ale chtěli bychom rozdělit den na specifičtější úseky.
+
+Ruby i Java nám v takovém případě poskytují stejné možnosti. První možností je využití již známého příkazu if, který rozšíříme o klíčové slovo elsif (v Javě se používá konstrukce else-if). Toto klíčové slovo nám jednoduše umožní do příkazu if přidat další podmínku. Výše zmíněný příklad s rozdělením dne, by pak v kódu mohl vypadat takto:
+
+#start#
+if part_of_the_day == :morning
+  # make a coffee
+elsif part_of_the_day == :forenoon
+  # make a sandwich
+elsif part_of_the_day == :noon
+ # cook a lunch
+elsif part_of_the_day == :afternoon
+  # make a tea
+elsif part_of_the_day == :evening
+  # cook a dinner
+else
+  # do not bother me I am sleeping
+end
+#stop#
+
+
+Příkaz elsif se většinou využívá, pokud máme podmínky tři, maximálně čtyři. Při vyšším počtu podmínek se už zápis stává poněkud nepřehledným a je lepší využít jinou konstrukci. Tato jiná konstrukce je v Javě známá pod jménem switch a v Ruby se jí říká case. Rozdíl je hlavně v názvu a syntaxi, ale použití obou příkazů je totožné. I v Javě se v příkazu switch používá klíčové slovo case, takže tato konstrukce nemůže být pro Java programátory až tak nepřehledná. Pomocí příkazu case by se náš příklad s rozdělením částí dne zapsal následujícícm způsobem:
+
+#start#
+case part_of_the_day
+when :morning then # make a coffee
+when :forenoon then # make a sandwich
+when :noon then # cook a lunch
+when :afternoon then # make a tea
+when :evening then # cook a dinner
+else
+  # do not bother me I am sleeping
+end
+#stop#
+
+
+Jak je vidět, použití příkazu case celý zápis velice zpřehlednilo. Zápis je také kratší o čtyři řádky. Pokud bychom se řídili filosofií, že čím méně řádků kódu, tím méně chyb, mohli bychom říci, že tento kód je méně náchylný k chybám. Za povšimnutí určitě stojí větev else, která odchytává případy, kdy podmínka nevyhovuje ani jedné z uvedených variant. V Javě je ekvivalentem větve else návěstí, které je označeno klíčovým slovem default.
+
+###Cykly
+Dobrá zpráva pro programátory, kteří k Ruby přecházejí z Javy je, že Ruby obsahuje pouze dva příkazy pro práci s cykly (příkazy while a until) a není zde tedy mnoho k učení. Jak jsme si mohli povšimnout, Ruby neobsahuje příkaz cyklu for jako Java. Respektive Ruby tento příkaz obsahuje, ale není to příkaz cyklu, ale iterátor - ty budou probrány až v následující kapitole.
+
+Další dobrou zprávou je, že tyto dva příkazy cyklu, které v Ruby existují, mají velice podobné použití jako příkaz while v jazyku Java. V této části práce budou představeny konstrukce, které jsou známy v Javě jako while a do-while. Výhodou je určitě i to, že syntaxe těchto příkazů je v Ruby velice podobná. Stačí si kolem podmínek odmyslet kulaté závorky a kolem těla cyklu si odmyslet složené závorky, respektive úvodní složenou závorku nahradit klíčovým slovem do a závěrečnou složenou závorku nahradit klíčovým slovem end.
+
+Stejně jako v Javě, cyklus while provádí opakování, dokud hodnota výrazu v podmínce nenabyde hodnoty false. Jinými slovy, pokud je hodnota true, cyklus probíhá pořád dál:
+
+#start#
+i = 0
+while i < 10
+ print i
+ i += 1
+end 
+#=> 0123456789
+#stop#
+
+
+Příkaz if má svůj protějšek v příkazu unless a stejně tak má příkaz while svůj protějšek v příkazu until. Příkaz until v Javě neexistuje a jedná se o další z pokusů, jak se Ruby snaží být co možná nejexpresivnější. Cyklus s příkazem until se provádí, dokud hodnota výrazu v podmínce není true (přesný opak cyklu while). Takto by pak vypadal kód, když bychom opět chtěli vypsat čísla od 0 do 9, ale tentokrát pomocí příkazu until:
+
+#start#
+i = 0
+until i == 10
+ print i
+ i += 1
+end 
+#=> 0123456789
+#stop#
+
+
+V předchozích příkladech, jsme si ukázali klasické cykly, které dokola provádějí příkazy, které v nich jsou vloženy. Může ale nastat případ, kdy budeme chtít, aby se příslušné kusy kódu v cyklu provedli alespoň jednou a to nezávisle na vyhodnocené podmínce. V Javě se pro tento typ úlohy využívá konstrukce do-while a ani Ruby nezůstává pozadu. Následující příklad demonstruje cyklus while, který se provede, i když je hodnota výrazu v podmínce false (cyklus se opakuje, pokud je hodnota výrazu v podmínce true):
+
+#start#
+begin
+  puts "Do-while statement transform from Java to Ruby"
+end while false 
+#=> Do-while statement transform from Java to Ruby
+#stop#
+
+
+Stejně jako lze příkaz if nebo unless použít až za výrazem jako tzv. modifikátor výrazu, stejně lze použít i příkaz while, jak můžeme vidět v předcházejícím příkladu. Kód, který je uzavřen do bloku begin-end, představuje výraz a while je použit jako modifikátor tohoto výrazu. Úplně stejně by šel použít i příkaz until.

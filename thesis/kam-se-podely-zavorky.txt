@@ -1,0 +1,43 @@
+Jedním z největších syntaktických rozdílů Ruby oproti Javě je používání závorek u metod. V Ruby jsou totiž tyto závorky pouze dobrovolné a nemusí se tedy vždy uvádět. Většinou se závorky uvádějí jen pokud to má za důsledek zpřehlednění kódu. Oba níže uvedené příklady jsou zaměnitelné:
+
+#start#
+puts ("Hello world") => Hello world
+puts "Hello world" => Hello world
+#stop#
+
+
+Dalším nepřehlédnutelným rozdílem oproti Javě je používání středníků na konci řádků. V Ruby se středníky na konci řádků nepíší. Přesto však má v Ruby středník své využití. Používá se k oddělení více příkazů, které se nacházejí na jednom řádku. S využitím středníků je tedy možné napsat například definici metody na jeden řádek:
+
+#start#
+def say_hello_world; puts "Hello world!"; end
+#stop#
+
+
+Je na programátorovi, aby zvážil, který zápis je pro něj v danou chvíli přehlednější a který lépe vystihuje jeho myšlenku. Zápis uvedený výše je ekvivalentní tomuto zápisu na více řádek:
+
+#start#
+def say_hello_world
+  puts "Hello world!"
+end
+#stop#
+
+
+Složené závorky jsou další významný syntaktický prvek, který v Ruby oproti Javě chybí. Složené závorky, které se v Javě používají pro definování bloku kódu kolem tříd nebo metod, jsou v Ruby nahrazeny klíčovým slovem end. Respektive počáteční závorka se nepoužívá vůbec a koncová závorka je nahrazena slovem end. Vše si můžeme demonstrovat na definici jednoduché třídy a metody v obou jazycích. Nejdříve v jazyku Java:
+
+<pre class='nomargin'><textarea class='code'>
+public class Movie {
+  public void play() {
+    // some code to play the movie       
+  }     
+}
+</textarea></pre>
+
+A takto vypadá definice třídy a metody v jazyku Ruby:
+
+#start#
+class Movie
+  def play
+    # some code to play the movie
+  end
+end
+#stop#

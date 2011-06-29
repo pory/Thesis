@@ -1,0 +1,62 @@
+**[alHabache2008]**<br />ALHABACHE, Khaled. Khaled alHabache's official blog [online]. December 19, 2008 [cit. 2011-06-20]. Ruby reflection. Dostupné z WWW: < http://www.khelll.com/blog/ruby/ruby-reflection/>.
+
+**[alHabache2008b]**<br />ALHABACHE, Khaled. Khaled alHabache's official blog [online]. December 28, 2008 [cit. 2011-06-20]. Ruby callbacks. Dostupné z WWW: < http://www.khelll.com/blog/ruby/ruby-callbacks/>.
+
+**[alHabache2009]**<br />ALHABACHE, Khaled. Khaled alHabache's official blog [online]. May 24, 2004 [cit. 2011-06-19]. Ruby and Functional Programming. Dostupné z WWW: <http://www.khelll.com/blog/ruby/ruby-and-functional-programming/>.
+
+**[alHabache2009b]**<br />ALHABACHE, Khaled. Khaled alHabache's official blog [online]. May 24, 2009 [cit. 2011-06-20]. Ruby Currying. Dostupné z WWW: <http://www.khelll.com/blog/ruby/ruby-currying/>.
+
+**[Avdi2010]**<br />GRIMM, Avdi. Virtous Code [online]. 2008 February 23 [cit. 2011-06-19]. Monkeypatching is Destroying Ruby. Dostupné z WWW: <http://avdi.org/devblog/2008/02/23/why-monkeypatching-is-destroying-ruby/>. 
+
+**[Atwood2008]**<br />ATWOOD, Jeff. Coding Horror [online]. Jul 12, 2008 [cit. 2011-06-19]. Monkeypatching For Humans. Dostupné z WWW: <http://www.codinghorror.com/blog/2008/07/monkeypatching-for-humans.html>.
+
+**[Confreaks2010]**<br />HANSSON, David. Confreaks [online]. 2010 [cit. 2011-06-19]. Ruby Conference 2010. Dostupné z WWW: <http://confreaks.net/videos/431-rubyconf2010-keynote-why-ruby>.
+
+**[Fowler1999]**<br />FOWLER, Martin. Refactoring: Improving the Design of Existing Code. July 8, 1999. 464 s.
+**[Fowler2010]**<br />FOWLER, Martin. Martin Fowler [online]. 2010 [cit. 2011-06-20]. DomainSpecificLanguage. Dostupné z WWW: <http://martinfowler.com/dsl.html>.
+
+**[Friedl2006]**<br />FRIEDL, Jeffrey. Mastering Regular Expressions. Sebastopol, CA : O'Reilly, 2006. 544 s.
+**[GitHub2010]**<br />Github [online]. 2011 [cit. 2011-02-17]. Secure source code hosting and collaborative development - GitHub. Dostupné z WWW: <https://github.com/>.
+
+**[Goldberg1996]**<br />GOLDBERG, Benjamin. Functional Programming Languages. ACM Computing Surveys [online]. March 1996, 28, [cit. 2011-06-19]. Dostupný z WWW: <http://www.cs.nyu.edu/goldberg/pubs/gold96.pdf>.
+
+**[Haskell2008]**<br />HaskellWiki [online]. 3 January 2008 [cit. 2011-06-20]. Currying. Dostupné z WWW: <http://www.haskell.org/haskellwiki/Currying>.
+
+**[Hopkins2010]**<br />HOPKINS, Peter. Big think [online]. 2010 [cit. 2011-06-19]. Big Think Interview With David Heinemeier Hansson. Dostupné z WWW: <http://bigthink.com/ideas/21596>.
+
+**[James1987]**<br />JAMES, Geofrey. The Tao of Programming. Santa Monica, California : Info Books, 1996. 151 s.
+**[Linnebo2008]**<br />LINNEBO, Oystein. Compositionality and Frege's Context Principle [online]. [s.l.] : University of Bristol, 2008 [cit. 2011-06-19]. Dostupné z WWW: <http://seis.bris.ac.uk/~plxol/CP.pdf>.
+
+**[LoudThinking]**<br />HANSSON, David. Loud Thinking [online]. 2005 [cit. 2011-06-19]. About David Heinemeier Hansson. Dostupné z WWW: <http://www.loudthinking.com/about.html>.
+
+**[Malý2011]**<br />MALÝ, Martin. Zdroják.cz [online]. 31. 1. 2011 [cit. 2011-06-20]. Javascriptaření: hrajte si s funkcemi!. Dostupné z WWW: <http://zdrojak.root.cz/clanky/javascriptareni-hrajte-si-s-funkcemi/>.
+
+**[Matsumoto2001]**<br />MATSUMOTO, Yukihiro. Ruby in a Nutshell. Sebastopol, CA : O'Reilly, 2001. 218 s.
+
+**[Moris2010]**<br />MORRIS, Tony. T<br />ony Morris [online]. 2010 [cit. 2011-06-20]. What Does Functional Programming Mean?. Dostupné z WWW: <http://projects.tmorris.net/public/what-does-fp-mean/artifacts/0.3/chunk-html/index.html>.
+
+**[Opensource2010]**<br />Open Source Initiative [online]. 2010 [cit. 2011-06-19]. Open Source Initiative OSI - The MIT License (MIT):Licensing. Dostupné z WWW: <http://opensource.org/licenses/mit-license.php>.
+
+**[Perrotta2010]**<br />PERROTTA, Paolo. Metaprogramming Ruby: Program Like the Ruby Pros. February 22, 2010. 240 s.
+
+**[Prechelt2002]**<br />PRECHELT, Lutz. Institute for Program Structures and Data Organization : Institute for Program Structures and Data Organization [online]. 2002 [cit. 2011-06-19]. Are Scripting Languages Any Good? A Validation of Perl, Python, Rexx, and Tcl against C, C++, and Java. Dostupné z WWW: <http://page.mi.fu-berlin.de/prechelt/Biblio/jccpprt2_advances2003.pdf>.
+
+**[Raiter1993]**<br />RAITER, Brian. Muppetlabs [online]. 1993 [cit. 2011-06-19]. The Brainfuck Programming Language. Dostupné z WWW: <http://www.muppetlabs.com/~breadbox/bf/>.
+
+**[Raymond2003]**<br />RAYMOND, Eric. The Art of UNIX Programming. Boston, Massachusetts : Addison-Wesley Professional, 2003. 560 s.
+
+**[Sosinski2008]**<br />SOSINKI, Robert. Robert Sosinski [online]. 2008/12/21 [cit. 2011-06-20]. Understanding Ruby Blocks, Procs and Lambdas. Dostupné z WWW: <http://www.robertsosinski.com/2008/12/21/understanding-ruby-blocks-procs-and-lambdas/>.
+
+**[Spolski2006]**<br />SPOLSKI, Joel. Joel on Software [online]. August 01, 2006 [cit. 2011-06-20]. Can Your Programming Language Do This?. Dostupné z WWW: <http://www.joelonsoftware.com/items/2006/08/01.html>. 
+
+**[Thomas2004]**<br />THOMAS, Dave, et al. Programming Ruby : The Pragmatic Programmer’s Guide. Second Edition. Dallas Texas : The Pragmatic Bookshelf, 2004. 833 s.
+
+**[Tiobe2011]**<br />TPCI History for Language Ruby [online]. 2011 [cit. 2011-06-26]. TIOBE Software. Dostupné z WWW: <http://www.tiobe.com/index.php/paperinfo/tpci/Ruby.html>.
+
+**[Venners2003]**<br />VENNERS, Bill. Artima Developer [online]. September 29, 2003 [cit. 2011-06-19]. The Philosophy of Ruby. Dostupné z WWW: <http://www.artima.com/intv/rubyP.html>.
+
+**[Ward2004]**<br />WARD, M. P. Language Oriented Programming [online]. October 2004 [cit. 2011-06-20]. Dostupné z WWW: <http://www.cse.dmu.ac.uk/~mward/martin/papers/middle-out-t.pdf>.
+
+**[Whamond2010]**<br />WHAMOND, Chris. Signal vs. Noise [online]. Dec 10 2010 [cit. 2011-06-19]. Making Sense with Ruby‘s unless. Dostupné z WWW: <http://37signals.com/svn/posts/2699-making-sense-with-rubys-unless>.
+
+**[Why2005]**<br />Why‘s (Poignant) Guide to Ruby [online]. 2005 [cit. 2011-06-19]. Dostupné z WWW: <http://mislav.uniqpath.com/poignant-guide/>.

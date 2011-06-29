@@ -1,0 +1,13 @@
+Tato kapitola si klade za cíl představit základní syntaktické a sémantické rozdíly mezi jazyky Ruby a Java. Ruby je dáváno do kontrastu s Javou, protože Java je z dlouhodobého hlediska nejpoužívanějším (nejrozšířenějším) programovacím jazykem a stala se v podstatě standardem mezi programovacími jazyky. Z tohoto důvodu pro lepší pochopení Ruby jsou v celé práci příklady demonstrovány právě v kontrastu s jazykem Java.
+
+Aby mohly být vysvětleny a ukázány principy, proč má smysl se jazykem Ruby zabývat, je nejdříve nutné pochopit alespoň základní syntaxi a konstrukty jazyka. Právě k tomuto účelu slouží tato kapitola. V kapitole jsou popsány základy jazyka, které jsou nutné pro pochopení složitějších případů využití Ruby. Rozsah práce ani neumožňuje podrobný výklad a pro pochopení hlubších souvislostí proto odkazuji na [[Thomas2004]](/diplomova-prace/pouzita-literatura#sections), kde se nachází podrobná referenční příručka Ruby.
+
+Tato část práce bude obsahovat ukázky kódu a pro pochopení příkladů je důležité rozpoznat, která část textu je programový kód, která výstup a která komentář. Všechny příklady budou vypisovány do růžového rámečku a pro snadnější optické odlišení bude použit jiný font. Typická ukázka kódu pak bude vypadat takto:
+
+<pre class='nomargin'><textarea class='code'>
+# Takto jsou formátovány komentáře
+Toto je příkaz #=> Takto vypadá výstup
+</textarea></pre>
+
+
+Komentáře se v Ruby zapisují znakem # a vše, co je napravo od něj, je ignorováno. Pro lepší grafické odlišení jsou navíc komentáře označeny zelenou barvou. Výstup aplikace je vždy šedivou barvou a je uvozen značkou #=>, za kterou už následuje samotný výstup.

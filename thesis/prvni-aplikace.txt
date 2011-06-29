@@ -1,0 +1,21 @@
+Nejznámnější poučkou, kterou se lze o Ruby dočíst je, že všechno v Ruby je objekt. Tato věta zaznívá o Ruby ze všech stran. Zdálo by se tedy logiké začít od objektů, když právě ty jsou pro Ruby natolik typické. Naše objevování Ruby ale začne něčím jednodušším a daleko klasičtějším, aplikací, která dokáže na obrazovku vypsat text Hello world.
+
+Napsat první aplikaci v Ruby je snadnější, než se na první pohled může zdát. Aplikace nemusí být tvořena z žádných tříd, ani nemusí obsahovat speciálně pojmenované metody. S trochou shovívavosti, lze aplikací nazvat jakýkoliv příkaz v Ruby, který je uložený do souboru a interpretovaný Ruby interpretem. Přesnější označení takového souboru by bylo spíše skript než aplikace. Ruby kód, která vypíše na obrazovku text Hello world, pak vypadá jednoduše takto:
+
+#start#
+puts "Hello world"
+#stop#
+
+
+Pro porovnání, takto vypadá stejná aplikace zapsaná v jazyku Java:
+<pre class='nomargin'>
+<textarea class='code'>
+class HelloWorldApp {
+  public static void main(String[] args) {
+    System.out.println("Hello World");
+  }
+}
+</textarea>
+</pre>
+
+Rozdíl mezi oběma aplikacemi je na první pohled patrný. Ruby obsahuje pouze příkaz, který se má vykonat a žádný kód navíc. Díky tomu, že jde o skriptovací interpretovaný jazyk, interpret jen vyhodnotí jednotlivé řádky kódu a prezentuje výsledek. V tomto případě interpretuje příkaz puts (výpis na standardní výstup), který jako parametr dostal řetězec Hello world.

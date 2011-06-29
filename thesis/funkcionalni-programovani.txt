@@ -1,0 +1,350 @@
+Ruby patří mezi imperativní jazyky a může se tak zdát zvláštní, že budeme mluvit o funkcionálním programování právě ve spojitosti s Ruby. Funkcionální programovací jazyky patří do rodiny deklarativních jazyků. Cílem této kapitoly není přesvědčit čtenáře, že Ruby je funkcionální jazyk. Cílem této kapitoly je ukázat, že je možné v Ruby využít postupy a principy, které jsou používány ve funkcionálním paradigmatu. Když jsme na začátku této práce popisovali základní vlastnosti Ruby, tvrdili jsme, že Ruby v sobě kombinuje přístupy imperativního i funkcionálního programovaní. Prozatím jsme se zaměřovali převážně na imperativní stránku Ruby a nyní je na čase dokázat, že Ruby obsahuje i přístupy známé z funkcionálního programování.
+
+Hlavní rysy funkcionálního programování jsou zmíněny v kapitole 2.5.4 Funkcionální programování. V této kapitole se ale podíváme na funkcionální programování mnohem podrobněji a kromě představení základních principů si přímo ukážeme, jak jsou tyto principy implementovány v Ruby. Jak jsme si již řekli dříve, Ruby není funkcionální jazyk, pouze přebírá a využívá některých myšlenek z funkcionálního způsobu myšlení a cílem této kapitoly je představit zde právě tyto myšlenky.
+
+Podle Tonyho Morrise [Morris2010] dochází při debatě o funkcionálních jazycích často k jedné zásadní chybě. Většinou se totiž tato debata koncentruje již na konkrétní znaky funkcionálních jazyků, jako jsou například funkce vyšších řádů1 nebo currying (oba termíny budou podrobně vysvětleny později v této kapitole) a zapomíná se na samotnou podstatu. Funkcionální jazyky jsou postaveny na dvou velice jednoduchých vlastnostech, přičemž první vlastnost dokonce implikuje druhou. První vlastností je referenční transparentnost a druhou vlastností je princip kompozicionality. Tyto termíny budou dále podrobněji rozebrány. Je však ještě zapotřebí říci, že tyto termíny platí striktně pro čistě funkcionální jazyky, takže i v jazycích, kterou jsou za funkcionální považovány, jsou tyto principy dodržovány ve větší či menší míře.
+
+###Referenční transparentnost
+
+Funkcionální programování má svoje základy v matematice, konkrétně v teorii funkcí a v lamda-kalkulu. Referenční transparentnost je princip, který je vlastní matematickým funkcím. Princip referenční transparentnosti říká, že výsledek funkce je závislý pouze na vstupních proměnných a není závislý na žádném externím stavu. Vezměme si jednoduchou funkci:
+
+<pre class='nomargin'><textarea class='code'>
+f(x) = x + 1
+</textarea></pre>
+
+Hodnota této funkce je závisla pouze na proměnné x. Jinými slovy můžeme říci, že tato funkce nemá žádný externí stav, na kterém by byl závislý její výsledek. Toto neplatí pouze pro tuto triviální funkci, ale platí to pro veškeré matematické funkce. Matematické funkce jsou referenčně transparentní, nemají žádnou závislost na svém okolí.
+
+Na referenční transparentnost je možné nahlížet ještě z jiného úhlu pohledu. Můžeme říci, že funkce je referenčně transparentní, jestliže při neměnných vstupních hodnotách, je výsledek funkce pořád stejný. To má mimo jiné za následek, že namísto funkce můžeme vložit do programu rovnou její výsledek a nijak se tím neovlivní správné fungování programu. Toto je umožněno díky tomu, že výsledek funkce není závislý na žádném externím stavu. Pokud jsme již jednou výsledek funkce s danými parametry získaly, můžeme jím v programu nahradit samotnou funkci.
+
+Výše popsanou matematickou funkci je možné samozřejmě přepsat v Ruby. Dokonce je i velice jednoduché dosáhnout referenční trasparentnosti, jakou má tato matematická funkce:
+
+#start#
+def plus_one(x)
+  x + 1
+end
+plus_one(5) #=> 6
+plus_one(5) #=> 6
+#stop#
+
+
+Výsledek metody je opravdu závislý pouze na vstupním parametru a volání metody se stejnými parametry vrací pořád stejnou hodnotu. Metoda je referenčně transparentní. Další vlastností referenční trasparentnosti a matematických funkcí je, že matematická funkce vždy vrací výsledek. Ve funkcionálních programech funkce vždy vrací výsledek, protože jediným možným výsledkem funkce je právě její výsledek a nikoliv změna stavu, tak jak tomu může být v imperativních jazycích. Tím, že funkce nemění žádný stav, říkáme, že nemá žádné vedlejší efekty. Toto je další klíčová vlastnost funkcionálního přístupu, která vyplývá z referenční transparentnosti.
+
+Pro úplnost ještě uveďmě, že kromě referenční transparentnosti existuje tzv. referenční neprůhlednost, která je přesným opakem referenční transparentnosti. To znamená, že výsledek funkce (pohybujeme-li se v Ruby tak metody) není závislý pouze na proměnných, které do funkce vstupují, ale také na externím stavu. Výsledek funkce tak nemusí a velice pravděpodobně ani nebude pořád stejný. Podívejme se na následující příklad:
+
+#start#
+@one = 1
+
+def plus_one(x)
+  x + @one
+end
+
+plus_one(5) #=> 6
+@one = 2
+plus_one(5) #=> 7
+#stop#
+
+
+Metoda plus_one je závislá na externím stavu @one, o kterém předpokládá, že se nebude měnit. Tento stav se však kdykoliv v průběhu programu změnit může, také se tomu tak stane a tím pádem metoda i při stejných vstupních parametrech nevrací stejnou hodnotu. Metoda není referenčně transparentní.
+
+V souvislosti s objektově orientovaným programováním je důležité si uvědomit jednu základní věc, která by mohla zaniknout. Objektově orientované programování používá jako základní stavební kameny třídy, pomocí nichž se tvoří objekty. Objekty ve většině případů neslouží k ničemu jinému, než k uchování stavu, v němž  se nachází výsek reality reprezentovaný daným objektem. Již samotnou existencí stavů je tedy samozřejmě nemožné dosáhnout referenční transparentnosti. Důsledkem je, že všechny metody, které používají instanční proměnné, nemohou být a nejsou referenčně transparentní.
+
+Navzdory předchozímu odstavci, lze i programu, který se řídí objektově orientovaným paradigmatem, využít principu referenční transparentnosti. Využitím tohoto prinicpu dochází k zpřehlednění kódu, přičmž jsou příkazy v metodě závislé pouze na vstupních parametrech a nemusíme pátrat po tom, jakých hodnot nabývají externí hodnoty. Zároveň lze takovýto kód rychleji procházet, krokovat a hledat případné chyby. Do popředí zájmu se zejména v poslední době dostává koncept škálování aplikací, kdy je výpočetní výkon rozložen na více počítačů, které jsou spojeny prostřednictvím počítačové sítě, nejčastěji internetu. Při distribuovaném zpracování je klíčové, aby prováděné operace nebyly závislé na externím stavu. Tím, že je program zpracováván paralelně by tak mohlo docházet k tomu, že by se stav během provádění operace změnil, díky operaci, která je zpracovávána na jiném počítači. Docházelo by tak k nekonzistenci a najít chybu v takovém programu by bylo takřka nemožné. Poslední a neméně důležitou výhodou psaní kódu, který je co nejméně zavislý na externích stavech, je znovupoužitelnost takového kódu. Tím, že je metoda závislá pouze na svých parametrech, může být kdykoliv z kódu vyjmuta a použita v jiném programu.
+
+###Princip kompozicionality
+
+Princip kompozicionality (neboli princip skládatelnosti) bývá označován jako Fregeho princip [Morris2010]. Gottlob Frege byl německý matematik a filosof, který žil na přelomu 19. a 20. století a bývá považován za zakladatele analytické filosofie. Jeho práce se mimo jiné zabývaly filosofií jazyka a matematikou. Fregeho princip říká, že význam komplexního výrazu je určen významem jeho jednotlivých částí a pravidel, které tyto části spojují [Linnebo2008]. Význam celku je určován na základě významu jednotlivých částí. Tuto teorii můžeme vztáhnout na počítačový program. Předpokládejme, že se program skládá z částí A, B, C a D a chceme vytvořit nový program, který se bude skládat z částí A, B, C a E. Program bude úplně stejný, až na to, že v novém programu bude část D nahrazena částí E. Na základě principu kompozicionality pak můžeme tvrdit, že úsilí, které bude potřeba k vyvinutí programu, se bude rovnat úsilí, které je potřeba k vyvinutí části E. Čím více se tato poslední věta blíží pravdě, tím více program splňuje princip kompozicionality a tím více se přibližuje k funkcionálnímu paradigmatu.
+
+Princip kompozicionality vychází z principu referenční transparentnosti. Čím více je dodržován princip referenční transparentnosti, tím více jsou jednotlivé části kódu nezávislé. Části aplikace tak mohou být vyjmuty ze stávajícho programu a bez většího úsilý použity v jiném programu. Programy, které se skládají z jasně identifikovatelných a nezávislých součastí mají své nezastupitelné výhody. Na základě chování jednotlivých částí, můžeme jasně říci, jak se program bude chovat jako celek. Tím, že jsou jednotlivé části nezávislé je možné je i samostatně testovat a snáze nalézat chyby, než kdyby bylo zapotřebí zkoumat celou aplikaci. Nezanedbatelnou výhodou takovýchto aplikací je i jejich možnost snadného škálování.
+
+###Jednoduché funkce v Ruby
+
+Jak již bylo v této práci mnohokrát řečeno, Ruby není funkcionální jazyk a ani nemá ambici jím být. Ruby je imperativní jazyk, který současně implementuje některé prvky z funkcionálního programování. V následujících částech budou představeny prvky funkcionálního programování v Ruby od jednoduchých až možná triviálních případů až po komplexní užití v podobě funkcí vyšších řádů.
+
+Funkce ve funkcionálních programovacích jazycích splňují dvě základní podmínky (nebo se k jejich splnění alespoň přibližují). Jedná se o již představené koncepty referenční transparentnosti a kompozicionality. Pro naše potřeby si tyto principy můžeme shrnout do následujících dvou předpokladů [alHabache2009]:
+
+* Funkce by při stejném vstupu měla vracet stále stejný výstup
+* Funkce má dělat pouze jednu jedinou věc (plnit jasně definovaný cíl) a nemá mít žádné vedlejší efekty jako je např. změna proměnných nebo výpis na obrazovku.
+
+Ruby je natolik flexibilní jazyk, že uživatele nenutí psát kód, který by odpovídal psaní funkcí, na druhou stranu mu toto psaní do jisté míry umožňuje. Použití tohoto stylu psaní má v Ruby své opodstatnění, které se týká zejména čitelnosti kódu. Pokud jsou metody psané tak, že jsou pouze jednoúčelové, slouží názvy metod de facto jako dokumentace. V případě, že programátor cítí potřebu okomentovat metodu, kterou právě vytvořil, aby v budoucnosti rozuměl kódu, který napsal, s největší pravděpodobností metoda neplní pouze jeden účel a je příliš složitá. Jednoúčelové metody, které nejsou zavislé na vnějším kontextu lze také mnohem snáze použít při programování pomocí vláken. V neposlední řadě se tyto metody mnohem lépe testují a zapadají tak do konceptu TDD, který je mezi Ruby programátory natolik oblíben.
+
+####First-class funkce
+
+Programování ve funkcionálních jazycích je postaveno na programování pomocí funkcí, což klade na funkce jisté požadavky. Tyto požadavky bývají shrnovány termínem funkce první třídy1, který mimo jiné vyjadřuje, že funkce jsou také objekty. Za tímto výrokem se dále ukrývá možnost předávat funkce jako argumenty do ostatních funkcí, vracet funkce jako návratové hodnoty z funkcí a ukládat funkce do datových struktur.
+
+Ruby toto všechno umožnuje ať už ve větší či menší míře elegance. Téměř veškeré prvky funkcionálního programování, se kterými se můžeme v Ruby setkat, jsou umožněny díky tzv. closures. Closures jsou v Ruby implementovány lambda a Proc funkcemi a bloky kódu. Lambda i Proc funkce jsou velice podobné blokům kódu, o kterých bylo hovořeno v kapitole 2.11.1 Bloky kódu, avšak existují mezi nimi jisté rozdíly. Vysvětlení těchto dvou konceptů je však za hranicemi rozsahu této práce a podrobný článek zabývající se touto tématikou napsal například Robert Sosinski [Sosinski2008], ve kterém vzájemně porovnává rozdíly mezi lambda a Proc funkcemi a bloky kódu.
+
+Ruby umožňuje uložit funkce do proměnných a ty pak předávat jako argumenty do metod. Uložení funkce do proměnné si můžeme představit, jako kdybychom do proměnné dokázali uložit metodu a pak ji ve vhodnou chvíli zavolat. V Ruby je možné do proměnné uložit lambda a Proc funkce a následně je zavolat metodou call, které jako argumenty předáme argumenty funkce, pokud nějaké má. V následujícím příkladu vytvoříme lamba funkci pro součet dvou čísel:
+
+#start#
+sum_two_numbers = lambda { |a, b| a + b }
+sum_two_numbers.call(1, 2) #=> 3
+#stop#
+
+
+V tomto případě jsme funkci rovnou zavolali pomocí metody call, ale stejně tak bychom ji mohli předat jako argument metodě. O tomto ale již více v kapitole 3.3.4 Funkce vyšších řádů.
+
+####Symbol vykřičníku a jeho užití
+
+Prozatím jsme o symbolu vykřičníku u názvu metod hovořili pouze z hlediska jeho expresivnosti, kdy nás tento symbol na něco upozorňuje. Ve většině případů nás upozorňuje, že jeho použitím dojde ke změně objektu, který je příjemcem zprávy. Před znalostí principů funkcionálního programování bychom se s tímto vysvětlením mohli spokojit, avšak teď již víme, že užití vykřičníku pochází právě z funkcionálního přístupu.
+
+Princip referenční transparentnosti říká, že funkce by neměla mít žádné vedlejší efekty a žádným způsobem by neměla měnit externí stav. Jelikož Ruby je imperativní jazyk, je velice jednoduché napsat metodu, která bude měnit stav objektu a tím pádem bude mít vedlejší efekt. Připomeňme si jen, že funkce by podle pricnipu referenční transparentnosti měla dělat pouze jednu věc (měla by mít jen jedno jasné poslání) a výsledek funkce by měl být v její návratové hodnotě.
+
+Znak vykřičníku (!) v názvu metod neříká pouze: „Používejte tuto metodu rozvážně“, ale také říká, že metoda má vedlejší efekt, mění stav objektu a tím pádem se nejedná o jednoduchou (čistou) funkci1. Jinými slovy, znak vykřičníku nás upozorňuje, že se metoda neřídí principem referenční transparentnosti.
+
+Následující příklady ukazují standardní metody třídy String, kdy můžeme vidět, jaký je rozdíl v používání metod s vykřičníkem a bez něj:
+
+#start#
+greeting = "Hello everybody!"
+puts greeting.upcase #=> "HELLO EVERYBODY!"
+puts greeting #=> "Hello everybody!"
+puts greeting.upcase! #=> "HELLO EVERYBODY!"
+puts greeting #=> "HELLO EVERYBODY!"
+#stop#
+
+
+Metoda upcase je instanční metoda třídy String a převádí daný řetězec (příjemce zprávy) na velká písmena. Když po užití metody upcase, vypíšeme na obrazovku samotný řetězec pomocí příkazu puts, vidíme, že se řetězec nezměnil. Metoda upcase vzala řetězec, převedla ho na velká písmena a takto převedený řetězec vrátila jako návratovou hodnotu, přičemž původní řetězec zůstal beze změny. Toto však již neplatí při použití metody upcase!, která kromě toho, že vrací převedený řetězec na velká písmena, tak změnila i původní řetězec. Jinými slovy, změnila stav objektu a právě proto se v jejím názvu vyskytuje znak vykřičníku.
+
+Užití vykřičníku u názvů metod, které nějakým způsobem mění stav, je pravidlo, které se dodržuje napříč všemi standardními knihovnami v Ruby. Je velice vhodné toto pravidlo dodržovat i u vlastních metod. Již tento jediný znak, který se objeví navíc v názvu metody, toho o metodě mnohé vypovídá a může tak zabránit špatnému užití.
+
+####Všechno v Ruby je výraz
+
+„Všechno v Ruby je výraz“ je hodně silné tvrzení. Všechno v Ruby není výraz, ale skoro všechno. Každý kus kódu, u nějž by mělo smysl, aby vracel nějakou hodnotu, tak skutečně činí. Tento fakt odlišuje Ruby například od Javy nebo od jazyka C, ve kterých třeba příkazy if nebo case jsou jen příkazy, kdežto Ruby k nim přistupuje jako k výrazům. Podívejte se na následující použití příkazů if a case v Ruby:
+
+#start#
+value = if true
+          "this will be the value"
+        else
+          "this will not be the value"
+        end
+puts value #=> this will be the value
+#stop#
+
+
+#start#
+year = 1985
+what_happend = case year
+               when 1985 then "This is the year when I was born"
+               else "Nohing interesting did not happen"
+               end
+puts what_happend #=> This is the year when I was born
+#stop#
+
+
+Skutečnost, že lze k příkazům if a case přistupovat jako k výrazům, umožňuje využít hodnotu, kterou vrací výraz jako celek. V případě rozhodovacích příkazů je výsledkem výrazu poslední řádek větve, do které se program svým průběhem dostane. Toto neobvyklé využití příkazů if a case má své opodstatnění hlavně v případech, kdy se tímto nestandardním použitím zvyšuje čitelnost a přehlednost kódu.
+
+Fakt, že všechno v Ruby je výraz se hojně využívá ještě k jiné věci a to k řetězení příkazů. Protože každý výraz vrací hodnotu, je možné tuto hodnotu ihned využít v následujícím příkazu nebo metodě. Je tak například možné přiřadit jednu hodnotu více proměnným najednou nebo využít zřetězeného volání metod:
+
+#start#
+puts ["c", "a", "d", "b"].sort.reverse #=> ["d", "c", "b", "a"]
+
+a = b = c = "this is common value"
+puts a #=> this is common value
+puts b #=> this is common value
+puts c #=> this is common value
+
+a = (b = 1 + 2) + 3
+puts a #=> 6
+puts b #=> 3
+#stop#
+
+
+####Návratové hodnoty u metod
+
+Funkce ve funkcionálním programování nemění stav a jsou tzv. bez vedlejších efektů. Jediným možným způsobem, jak dostat výsledek funkce, je prostřednictvím návratové hodnoty. Každá funkce má tedy svoji návratovou hodnotu, a protože každá funkce vrací nějakou hodnotu, je zbytečné, aby se vždy nutně používalo klíčové slovo, které by říkalo toto je návratová hodnota.
+
+Možnost neuvádět klíčové slovo return u metod v Ruby je tedy další vlastností, kterou si Ruby vypůjčilo od funkcionálního přístupu k programování. Fakt, že není nutné používat vždy klíčové slovo return, byl zmíněn již v kapitole 2.12 Metody, nyní se však dostáváme k tomu, jaký se za tím skrývá smysl. Pokud by metody v Ruby měli sledovat princip psaní tzv. čistých funkcí, měla by být využívána právě návratová hodnota metody a metoda by neměla mít žádné vedlejší efekty (měnit stav objektu). Každá metody v Ruby tedy vrací hodnotu a to dokonce i tehdy, kdy mění stav objektu a žádnou hodnotu by vracet nemusela. Je pouze na programátorovi, zda tuto hodnotu využije nebo ne. Jednoduchou ukázku toho, že metoda v Ruby vrací hodnotu i bez klíčového slova return poskytuje následující příklad:
+
+#start#
+def say_hello(name)
+  "Hello #{name}. How are you?"
+end
+
+say_hello("David") #=> Hello David. How are you?
+#stop#
+
+
+###Funkce vyšších řádů
+
+Funkce vyšších řádů jsou takové funkce, které přebírají funkce jako parametr a/nebo vracejí funkci jako výsledek. Toto je velice jednoduchá a srozumitelná defince, která vychází z [Malý2011]. V Ruby je tato funkcionalita umožněna díky closures, ať už jsou použity v jakékoliv ze tří svých podob (lamba funkce, Proc funkce, bloky kódu). Rovnou si ukážeme příklad, na němž bude vidět, jak je možné vytvořit metodu, která bude mít jako jeden ze svých parametrů blok kódu. Zároveň bude ukázka sloužit jako představení toho, jak je možné pomocí konceptu funkcí vyšších řádů definovat vlastní syntaktická pravidla. Konkrétně si definujeme vlastní příkaz cyklu:
+
+#start#
+def loop(items, &code)
+  for item in items do
+    code.call(item)
+  end
+end
+
+loop(1..3) do |number|
+  puts number * 10
+end
+#=> 10
+#=> 20
+#=> 30
+#stop#
+
+
+Metoda loop je náš vlastní příkaz cyklu, který jsme si definovali. Jak můžeme vidět, tak metoda přijímá dva parametry, kde prvním parametrem je kolekce kolem které chceme iterovat a druhým parametrem je kód, který se má spustit nad každou položkou kolekce. Při použití metody loop uvedeme první parametr klasicky do kulatých závorek (v našem případě je tímto parametrem interval od jedné do tří) a druhým parametrem je blok kódu, který je uvozen klíčovými slovy do a end. 
+
+Poslední neznámou částí kódu, o které je třeba se zmínit, je ampersand u druhého parametru v definici metody loop, &code. Znak empersandu (&) zajišťuje převod parametru na datový typ Proc. Při volání metody, tak jak jsme ji uvedli v našem případě, dochází k převodu bloku kódu na datový typ Proc. V metodě loop bychom mohli rovnou použít blok kódu i bez jeho převodu na datový typ Proc. Použití bloku kódu uvnitř metody má ovšem tu nevýhodu, že z názvu metody není poznat, že metoda pro své správné fungování potřebuje jako parametr blok kódu. Tato skutečnost je poznat pouze z těla metody, ve které se pro vložení bloku kódu používá klíčové slovo yield. Pro názornost zde uvádíme, jak by vypadala metoda loop, kdyby pracovala přímo s blokem kódu:
+
+#start#
+def loop(items)
+  for item in items do
+    yield(item)
+  end
+end
+#stop#
+
+
+Znak ampersandu by také nebylo potřeba u parametru code uvádět v případě, že bychom při použití metody loop, jako druhý parametr uvedli lambda funkci, jejíž interní reprezentací je automaticky datový typ Proc. Metoda loop a její použití by poté vypadalo následujícím způsobem:
+
+#start#
+def loop(items, code)
+  for item in items do
+    code.call(item)
+  end
+end
+
+loop(1..3, lambda { |number|  puts number * 10 })
+#stop#
+
+
+Volání metody loop s lambda funkcí jako druhým argumentem není příliš čitelné a proto se preferuje namísto lambda funkcí využití bloku kódu. Nicméně i tento příklad je plně funkční. Nejčastěji se tak při využití funkcí vyšších řádů můžeme setkat s paramtrem, který je uvozen ampersandem. Tento zápis má hned dvě hlavní výhody. První výhodou je, že hned z návěstí metody je patrné, že metoda přijímá jako parametr blok kódu (lambda funkci). Druhou výhodou je pak poskytnutí jisté variability, kdy můžeme danou metodu použít jak s blokem kódu, tak s lambda funkcí.
+
+####Metody na steroidech
+
+Každý programátor by se měl snažit, aby kód, který napíše, byl čitelný, dobře udržovatelný a v neposlední řadě snadno rozšiřitelný. Nyní bude následovat příklad, jehož snahou je ukázat hlavní výhody využití prvků fukncionálního programování v Ruby a jak tyto principy přispívají k zajištění výše uvedených vlastností dobrého kódu. Tento příklad je volně inspirován článkem Can Your Programming Language Do This, jehož autorem je Joel Spolski [Spolski2006].
+
+Příklad se skládá ze dvou části, přičemž v první části je vyřešen problém jedním způsobem a v druhé části je ukázano, jak by se problém dal řešit elegantnější cestou s totožným výsledkem. Naším úkolem je napsat kód, který dokáže uvařit dvě jídla. Prvním jídlem jsou špagety a druhým jídlem je guacamole. Pro zjednodušení předpokládejme, že při vaření špaget stačí všechny ingredience dát do hrnce a uvařit. Při přípravě guacamole pro zjednodušení předpokládejme, že všechny ingredience dáme do mixéru, kde je rozmixujeme. Kód, který by virtuálně připravil tato dvě jídla, by pak mohl vypadat takto:
+
+#start#
+def cook_spaghetti
+  puts "Get spaghetti and tomatos."
+  get_in_pot("spaghetti")  
+  get_in_pot("tomatos")
+  puts "Spaghetti is finished."
+end
+
+def cook_guacamole
+  puts "Get avocado, onion and tomatos."
+  put_in_blender("avocado")
+  put_in_blender("onion")
+  put_in_blender("tomatos")  
+  puts "Guacamole is finished."    
+end
+
+def get_in_pot(ingredient)
+  puts "#{ingredient.capitalize} is (are) in the pot."
+end
+
+def put_in_blender(ingredient)
+  puts "#{ingredient.capitalize} is (are) in the blender."
+end
+
+cook_spaghetti
+#=> Get spaghetti and tomatos.
+#=> Spaghetti is (are) in the pot.
+#=> Tomatos is (are) in the pot.
+#=> Spaghetti is (are) finished.
+
+cook_guacamole
+#=> Get avocado, onion and tomatos.
+#=> Avocado is (are) in the blender.
+#=> Onion is in (are) the blender.
+#=> Tomatos is (are) in the blender.
+#=> Guacamole is finished.
+#stop#
+
+
+Pro zjednodušení jsou veškeré činnosti nahrazeny textovým výpisem do konzole. Jako ilustrace je to, ale naprosto dostačující a po spuštění metod v konzoli, tak alespoň ihned můžeme vidět výsledek. Kód, který jsme napsali, dělá přesně to, co jsme po něm požadovali. Pokud se však na něj podíváme pozorněji, můžeme si všimnout, že se v něm vyskytují části kódu, které se opakují. Jak metoda cook_spaghetti, tak metoda cook_guacamole, mají tři velice podobné části. V první části se připravují ingredience, které jsou k přípravě pokrmu potřeba. V druhé části se všechny ingredience postupně zpracovávají danou metodou přípravy. Ve třetí části nás jen program informuje o tom, že je pokrm hotový.
+
+Na první pohled to není příliš patrné, ale tak, jak je aplikace napsána teď, neodpovídá principu DRY. Jinými slovy v aplikaci existují části kódu, které se opakují. Nabízí se tedy možnost zobecnit části kódu, které se opakují a vytvořit jednu obecnou metodu cook. Největší problém představuje, jakým způsobem do této nové metody předáme postup, kterým se ingredience mají zpracovat. Se znalostí funkcí vyšších řádů však víme, že tento postup můžeme do metody předat pomocí bloku kódu. Obecná metoda cook a její následné použití vypadá takto:
+
+#start#
+def cook(meal, *ingredients, &cooking_method)
+  puts "Get #{ingredients.join(' and ')}."
+  ingredients.each { |ingredient| cooking_method.call(ingredient) }
+  puts "#{meal.capitalize} is (are) finished."
+end
+
+cook("spaghetti", "spaghetti", "tomatos") do |ingredient|
+  puts "#{ingredient.capitalize} is (are) in the pot." 
+end
+#=>Get spaghetti and tomatos.
+#=>Spaghetti is (are) in the pot.
+#=>Tomatos is (are) in the pot.
+#=>Spaghetti is (are) finished.
+
+cook("guacamole", "avocado", "tomatos", "onion") do |ingredient|
+  puts "#{ingredient.capitalize} is (are) in the blender."
+end 
+#=> Get avocado and tomatos and onion.
+#=> Avocado is (are) in the blender.
+#=> Tomatos is (are) in the blender.
+#=> Onion is (are) in the blender.
+#=> Guacamole is (are) finished.
+#stop#
+
+
+Výrazným způsobem se zkrátil kód celé aplikace. Veškré fungování nyní stojí na metodě cook, která se skládá pouze ze tří řádků kódu. Metoda cook přijímá tři parametry, kterými jsou zaprvé název pokrmu, dále jednotlivé ingredience, ze kterých se automaticky vytvoří pole díky znaku hvězdičky (*) a posledním parametrem je blok kódu, který představuje způsob zpracování jednotlivých ingrediencí. Generalizací metody cook z metod cook_spaghetti a cook_guacamole, jsme dosáhli ještě jedné nezanedbatelné věci. Kdybychom ještě před provedeným refactoringem chtěli přidat přípravu nového pokrmu, museli bychom v kódu definovat novou metodu. Tato nová metoda by sloužila k přípravě právě jednoho pokrmu. Nyní pro přípravu nového pokrmu nemusíme vytvářet novou metodu, ale pouze zavoláme metodu cook, které předáme odpovídající parametry. Výše popsanou generalizací se nám tedy podařilo upravit kód tak, aby byl do budoucna mnohem snáze rozšiřitelný.
+
+Na výše uvedeném příkladu je vidět, jakou moc a variabilitu získávají metody, kterým můžeme předávat bloky kódu. Bloky kódu si můžeme představit jako rozhraní metody, se kterým můžeme libovolně pracovat. Pokud vytvoříme metodu, která jako parametr akceptuje blok kódu, je to jako bychom k metodě vytvořili API1 a tím mnohonásobně zvýšili její flexibilitu. Otvíráme tím tak cestu i ostatním programátorům, kteří naši metodou mohou využít způsobem, který by nás třeba ani nenapadl.
+
+####Currying
+
+Dle [Haksell2008] currying je proces transformace funkce, která přijímá více parametrů, na funkci, která přijímá pouze jeden parametr a pokud funkci ještě nějaké parametry chybí, je výsledkem této transformace opět funkce. Currying je vlastnost, která je v Ruby implementována až od verze 1.9. Podívejme se nejdříve na to, co tento pojem znamená, protože z výše uvedené definice to nemusí být na první pohled patrné. Výše uvedená definice by se dala parafrázovat tak, že currying je schopnost převést funkci o n parametrech na n funkcí, kde každá akceptuje pouze jeden parametr. Představme si matematickou funkci, která akceptuje tři parametry x, y a z [alHabache2009b]:
+
+<pre class='nomargin'><textarea class='code'>
+f(x,y,z) = 4x + 3y + 2z
+</textarea></pre>
+
+Tuto funkci můžeme rozepsat jako kompozici tří funkcí (pro každý parametr jednu):
+
+<pre class='nomargin'><textarea class='code'>
+f(x),(y),(z) = 2z + (3y + (4x))
+</textarea></pre>
+
+Currying je proces v němž můžeme složenou funkci, která akceptuje více parametrů, převést na kompozici funkcí, u níž každá akceptuje jen jeden parametr. Výsledkem této transformace potom jsou tzv. parciální funkce, které vznikají z původních funkcí tak, že mají již některé parametry předvyplněny. Pokud zůstaneme u výše zmíněného matematického příkladu, pak parciální funkcí by byla funkce, kde by byla za parametr x dosazena již konkrétní hodnota.
+
+Nyní si vše ukážeme na konkrétním příkladu. Chceme vytvořit dvě funkce, kterým jako argument předáme interval a první funkce vypočte součet všech čísel v daném intervalu a druhá funkce vypočte součet násobků všech čísel v daném intervalu:
+
+#start#
+sum = lambda do |range|
+  range.reduce { |sum, n| sum + n }
+end
+
+multiply = lambda do |range|
+  range.reduce { |sum, n| sum * n }
+end
+  
+sum.call(1..5) #=> 15 # 1 + 2 + 3 + 4 + 5 = 15 
+multiply.call(1..5) #=> 120 # 1 * 2 * 3 * 4 * 5 = 120
+#stop#
+
+
+Když se pozorněji podíváme na funkce, které jsme definovali, zjistíme, že jsou téměř totožné. Jediné v čem se odlišují, je druh výpočtu, který se v nich provádí. Konkrétně se jedná o části sum + n a sum * n. Jinak je zápis naprosto totožný. Obě funkce tedy můžeme zobecnit do jedné funkce, které navíc kromě rozsahu předáme jako argument i výpočet, který se má provést:
+
+#start#
+calculation = lambda do |f, range|
+  range.reduce { |sum, n| f.call(sum, n) }
+end
+#stop#
+
+
+Takto zobecněnou funkci poté použijeme následujícím způsobem, abychom dostali stejné výsledky, jako v předchozím příkladu:
+
+#start#
+calculation.call(lambda {|sum, n| sum + n }, 1..5) #=> 15
+calculation.call(lambda {|sum, n| sum * n }, 1..5) #=> 120
+#stop#
+
+
+Volání funkce calculation není příliš elegantní a přes množství argumentů můžeme i přehlédnout k čemu uvedená funkce vlastně slouží. Nyní přichází ke slovo currying, s jehož pomocí můžeme tuto obecnou funkci transformovat na funkci konkrétní. Currying nám umožní vytvořit parciální funkci, ve které bude předvyplněn parametr, který se týká výpočtu. Ruby pro tuto transformaci definuje metodu Proc#curry. Můžeme tak vytvořit funkce sum a multiply, které ale tentokrát nebudou implementovány samostatně a nebude tak docházet k duplicitám v kódu. Obě funkce budou nyní vycházet z funkce calculation. Vytvoření obou funkcí a jejich použití je vidět na následujícíh řádcích:
+
+#start#
+sum = calculation.curry.call(lambda {|sum, n| sum + n })
+multiplication = calculation.curry.call(lambda {|sum, n| sum * n })
+
+sum.call(1..5) #=> 15 
+multiply.call(1..5) #=> 120
+#stop#

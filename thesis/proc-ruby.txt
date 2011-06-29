@@ -1,0 +1,3 @@
+Otázkou stále zůstává, co je na Ruby tak úžasného, že má cenu se jím zabývat. To, že Ruby činí programátory šťastnějšími, není ta správná odpověď. Je důležité klást si otázky, jež dávají odpovědi, které nejsou postaveny pouze na emocích, ale na reálných faktech. Pouze pokud známe praktické důvody toho, proč se nám nějaká technologie líbí, můžeme ji doporučit ostatním nebo naopak objevit technologii novou. Nejdříve potřebujeme znát argumenty, které pak mezi sebou můžeme porovnávat a hodnotit.
+
+V následujících odstavcích budou představeny základní koncepty a důvody toho, proč komunita kolem Ruby nedá na svůj jazyk dopustit. Většina z těchto tezí pak bude v práci dále rozvedena a představena na konkrétních příkladech.

@@ -1,0 +1,172 @@
+Příkazy pro cykly, které jsou definovány v Ruby, jsou skutečně základní, až primitivní. V Ruby dokoce neexistuje ani klasický příkaz cyklu for, který je znám z mnoha ostatních jazyků, jako je například Java, C nebo C++. Popravdě řečeno, Ruby ani nepotřebuje sofistikováné nástroje pro práci s cykly, protože ve většině případů, kdy je potřeba nějakým způsobem iterovat, se nepoužívají cykly, ale iterátory. Protože všechno v Ruby je objekt, tak dokonce i celá čísla mají své metody, které slouží jako aerátory. To je důvodem, proč je v Ruby nepotřebný příkaz cyklu for. Příkaz cyklu for je jednoduše nahrazen iterátorem. Aby jsme byli korektní, klíčové slovo for se v Ruby vyskytuje, ale nejedná se o příkaz cyklu, ale o syntaktickou pomůcku, která využívá iterátoru each. O tom ale až později. Pro pochopení iterátorů, je nedříve nutné nahlédnout alespoň částěčně na bloky kódu.
+
+####Bloky kódu
+Když Dave Thomas se svými kolegy píše v [Thomas2004] o blocích, zmiňují zde citaci jednoho z recenzentů knihy: „Toto je velice pěkná a zajímavá funkcionalita, pokud jste do teď nedávali pozor, je na čase abyste začali“. S tímto postřehem nelze než souhlasit. Bloky jsou jednou z nejzajímavějších struktur Ruby. V Ruby se používají k implementaci zpětných volání1, k předávání částí kódu v aplikaci a k implementaci iterátorů.
+
+A jak se bloky kódu zapisují? Existují dva základní způsoby. Prvním způsobem je uzavřít kód do složených závorek a druhým je uzavřít kód mezi klíčová slova do a end:
+
+<pre class='nomargin'><textarea class='code'>
+{ puts 'This is a block' }
+do
+  puts 'This is a block too'
+end
+</textarea></pre>
+
+
+Oba uvedené zápisy jsou ekvivalentní. Pro rozhodnutí, kdy jaký zápis použít, se používá jedno nepsané pravidlo - pro jednořádkový blok se používají složené závorky a více řádkový blok se uzavírá mezi klíčová slova do a end. Bloky kódu samy o sobě nemají žádný význam. Svůj význam dostanou, až když jsou volány jako parametr metody, která blok spustí. V metodě, která dostane blok jako parametr se blok spouští příkazem yield.
+
+#start#
+def block_call_method
+  puts 'Start of block_call_method'
+  yield
+  puts 'End of block_call_method'
+end
+block_call_method { puts 'This is my block' }
+
+#=>Start of block_call_method
+#=>This is my block
+#=>End of block_call_method
+#stop#
+
+
+Metoda yield může obsahovat i parametry, které se dají následně použít v bloku kódu. Parametry metody yield se deklarují jako parametry jakékoliv jiné metody, zajímavější je pak využití těchto parametrů uvnitř samotného bloku kódu. Parametry se v bloku kódu deklarují uvnitř samotného bloku a zapisují se mezi značky |. Na následujícím příkladu můžete vidět volání metody yield se dvěma parametry a jejich následné využití ve víceřádkovém bloku kódu:
+
+#start#
+def who_is_he
+  yield("Tomas", 25)
+end
+who_is_he do |name, age|
+  puts "His name is #{name} and he is #{age} years old."
+  puts "After 25 years #{name} will be #{age + 25} years old."
+end 
+ 
+#=> His name is Tomas and he is 25 years old.
+#=> After 25 years Tomas will be 50 years old.
+#stop#
+
+
+Trochu složitějším příkladem využití bloků v praxi je jejich využití při počítání Fibonacciho posloupnosti. Příklad je s malými úpravami převzat z [Thomas2004, str. 47]:
+
+#start#
+def fib_up_to(max)
+  i1, i2 = 1, 1 # paralelní přiřazení (i1 = 1 a i2 = 1)
+  while i1 <= max
+    yield i1
+    i1, i2 = i2, i1+i2
+  end
+end
+fib_up_to(100) {|f| print f, " " }
+#=> 1 1 2 3 5 8 13 21 34 55 89
+#stop#
+
+
+Příklad demonstruje sílu bloku kódu. Využíváme metodu, která dokáže spočítat Fibonacciho posloupnost, v které do bloku dostáváme jako parametry jednotlivá čísla posloupnosti a tato čísla můžeme dále libovolně zpracovat. Například je můžeme jednoduše vypsat tak, jak je dostaneme nebo s nimi nejdříve udělat výpočty a až po té je vypsat. Vše záleží pouze na našem bloku kódu, který metodě poskytneme jako parametr. Bloky kódu tak představují velice flexibilní nástroj, který poskytuje téměř neomezené možnosti.
+
+####Iterátory
+
+Předchozí krátká kapitola o blocích kódu představila základní koncept použití bloků a jejich syntaktický zápis. Alespoň částečná znalost a pochopení bloků kódu je totiž nezbytná k pochopení iterátorů. Iterátory v Ruby z velké části nahrazují klasické cykly a jejich využití je také mnohem častější než využití cyklů. To zejména díky faktu, že se s nimi mnohem lépe pracuje. Iterátory nejsou ve své podstatě nic jiného než metody, které jako parametry přijímají bloky kódu.
+
+Aniž bychom to zmiňovali, tak jsme se v této práci s jedním iterátorem již setkali. Bylo to v kapitole 2.9.1 Čísla, ve které byl použit iterátor times, jenž je definován pro instance celých čísel (instance tříd Fixnum a Bignum). Pro připomenutí, zdrojový kód příkladu vypadal takto:
+
+#start#
+number = 99
+5.times do 
+  puts "Number is #{number} and its class is #{number.class}"
+  number *= number
+end
+#stop#
+
+
+Metoda times nedělá nic jiného, než že příslušný blok kódu spustí tolikrát, kolik je hodnota čísla, jehož metoda je volána. Blokem kódu, který je iterátoru times poslán jako parametr jsou v tomto případě dva řádky:
+
+<pre class='nomargin'><textarea class='code'>
+puts "Number is #{number} and its class is #{number.class}"
+number *= number
+</textarea></pre>
+
+Asi nejčastěji se lze v praxi s iterátory setkat při procházení kolekcí a to jak při procházení klasických polí (instance třídy Array), tak asociativních polí (instance třídy Hash). Mezi nejpoužívanější iterátor patří metoda each, která prochází jeden prvek kolekce po druhém a umožňuje nám s ním pracovat. Například procházení polí pomocí klasických cyklů (například cyklu for), je založeno na procházení prvků pole s využitím indexů jednotlivých prvků pole. Nesporná výhoda iterátorů spočívá v tom, že se nepoužívají žádné indexy a nemůže se stát, že bychom indexovali prvek, který se v poli nenachází. Metoda each vždy vrátí pouze prvky, které se v kolekci nacházejí.
+
+#start#
+capitals = [ 'Rome', 'Paris', 'London' ]
+capitals.each do |capital|
+  puts capital 
+end
+
+#=> Rome
+#=> Paris
+#=> London
+#stop#
+
+
+Příklad výše ukazuje jednoduché použití iterátoru each, v kterém jsou postupně procházeny jednotlivé prvky pole, jež jsou následně vypsány metodou puts. Do bloku je předáván parametr capital, představující odkaz na jednotlivé prvky v poli. Můžeme s ním pochopitelně dále pracovat. Jak již bylo řečeno, v tomto případě neděláme nic jiného, než je výpis prvků na obrazovku.
+Na začátku kapitoly jsme slíbili, že se zde budeme zaobírat i klíčovým slovem for a jeho rolí. Teď je ta pravá chvíle se k němu vrátit. Výše uvedený příklad lze zapsat i pomocí klíčového slova for, kdy zápis velice nápaadně připomíná tvorbu cyklů pomocí iterátoru v Javě. Zápis by pak vypadal takto:
+
+#start#
+capitals = [ 'Rome', 'Paris', 'London' ]
+for capital in capitals do
+  puts capital
+end
+#stop#
+
+
+Tímto zápisem se ale nesmíme nechat zmýlit. Jedná se pouze o syntaktickou pomůcku. Ruby si pak tento zápis vnitřně upraví a použije iterátor each, jako my v prvním případě. Zápis pomocí příkazu for lze využít vždy, když má prvek, kolem kterého chceme iterovat definovánu metodu (iterátor), each. Je tak opět pouze na programátorovi, zda využije syntaxi metody each nebo příkazu for.
+
+Velice podobně lze procházet i asociativní pole. K jeho procházení se také používá metoda each, která ale do bloku kódu poskytuje tentokrát dva parametry. Prvním parametrem je identifikátor prvku v asociativním poli, tzv. klíč a druhým parametrem je hodnota. Příklad s městy tak můžeme rozšířit i o zemi, ve které se hlavní města nacházejí:
+
+#start#
+capitals = {
+  :Italy => 'Rome', :France => 'Paris', :England => 'London'
+}
+capitals.each do |country, capital| 
+  puts "Capital of #{country} is #{capital}."
+end
+
+#=> Capital of Italy is Rome.
+#=> Capital of France is Paris.
+#=> Capital of England is London.
+#stop#
+
+#####Klíčová slova pro práci z iterátory a cykly
+
+Kromě samotných klíčových slov používaných k definici cyklů nebo iterátorů, v Ruby existují ještě čtyři další klíčová slova, která se používají ke změně průběhu cyklů, ale i iterátorů. Změnou průběhu cyklů rozumíme například přerušení cyklu nebo jeho opakování. Těmito čtyřmi klíčovými slovy jsou break, redo, next a retry:
+
+* break:  Příkaz se používá k přerušení daného cyklu. Po použití tohoto příkazu program zastaví procházení cyklu a začne zpracovávat příkazy, které se nacházejí za cyklem.
+* redo: Cyklus se vrátí na začátek s tím, že se již znovu nevyhodnocuje podmínka cyklu (v případě iterátoru se nenačítá další prvek).
+* retry:  Cyklus se vrátí na začátek stejně jako v případě příkazu redo, s tím rozdílem, že se znovu vyhodnocuje podmínka cyklu. Cyklus probíhá celý znovu od začátku.
+* next: Po použití tohoto příkazu program skočí na konec těla cyklu a spustí další iteraci.
+
+Zatímco příkazy break a next jsou na pochopení docela snadné, tak příkazy retry a redo vypadají velice podobně a rozdíl mezi nimi není tak lehce postřehnutelný. V následujícím příkladu si tedy ukážeme právě příkazy redo a retry a na vlice jednoduché ukázce budeme demonstrovat základní rozdíl:
+
+<pre class='nomargin'><textarea class='code'>
+(0..3).each do |i|
+  puts "value: #{i}"
+  redo if i > 2
+end
+
+#=> value: 0
+#=> value: 1
+#=> value: 2
+#=> value: 3
+#=> value: 3
+#=> value: 3
+# nekonečný cyklus
+</textarea></pre>
+
+Jak je vidět, při příkazu redo se bez vyhodnocení podmínky (načtení dalšího prvku v případě iterátoru) znovu opakuje cyklus se stejnými hodnotami. V další ukázce je vidět rozdíl, který nastává při použití příkazu retry, při němž se celý cyklus opakuje celý od začátku s původními (vychozími) hodnotami:
+
+<pre class='nomargin'><textarea class='code'>
+(0..3).each do |i|
+  puts "value: #{i}"
+  retry if i > 2
+end 
+ 
+#=> value: 0
+#=> value: 1
+#=> value: 2
+#=> value: 3
+#=> value: 0
+#=> value: 1
+#=> value: 2
+#=> value: 3
+# nekonečný cyklus
+</textarea></pre>

@@ -1,0 +1,118 @@
+Moduly poskytují mechanismus, s jehož pomocí lze organizovat existující kód, který spolu určitým způsobem souvisí, do samostatných struktur. Existujícím kódem se myslí třídy, metody, konstanty a ve výjimečných případech atributy. Důvod, proč se v modulech nepoužívají atributy, bude objasněn později. Někoho by mohlo napadnout, že pro organizaci souvisejícího kódu již slouží třídy. Moduly však mají oproti třídám jednu zásadní vlastnost, nelze vytvářet jejich instance. Modul slouží pouze jako obálka pro kód, který je v něm uveden. Moduly mají dvě základní využití:
+
+* Používají se jako jmenné prostory.
+* Využívají se jako tzv. mixiny, kdy se přidávají do existujících tříd.
+
+Syntaxe pro zápis modulů je stejná jako syntaxe pro zápis tříd, pouze se klíčové slovo class nahradí klíčovým slovem module. Název modulu se píše s velkým počátečním písmenem, a pokud je název víceslovný, pak se používá velbloudí notace. Definice modulu končí klíčovým slovem end, stejně jako definice třídy.
+
+#start#
+module ThisIsMyFirstModule
+  # code inside a module
+end 
+#stop#
+
+###Jmenné prostory
+
+Prvním využitím modulů je jejich využití jako jmenných prostorů. V takovém případě je modul využíván pouze jako schránka pro kód, který je v modulu obsažen. Veškerý kód uvnitř modulu se z vnějšku volá s prefixem, který tvoří název modulu. Možnost uschovat určitou funkcionalitu do jmenného prostoru je důležitá z následujícího důvodu. Programování je z velké části o kombinování znovupoužitelných částí kódu a může se stát, že narazíme na případ, kdy chceme v našem programu využít dva soubory, přičemž každý slouží k jinému účelu, ale oba obsahují třídu se stejným názvem.
+
+Představme si situaci, kdy programujeme golfovou aplikaci a chceme v ní využít třídy, které jsme již kdysi napsali. Jedná se o třídy, které reprezentují golfový klub a golfovou hůl. Podívejme se, jak by vypadala situace, do které bychom se dostali, kdybychom nevyužili jmenné prostory. Pro názornost je v ukázce veškerý kód uveden, jako kdyby se nacházel v jednom souboru.
+
+#start#
+class Club
+  # code for a club as a sport unit
+  def initialize
+    puts "Club as a sport unit."
+  end
+end
+
+class Club
+  # code for a club as a sport equipment
+  def initialize
+    puts "Club as a sport equipment."
+  end  
+end
+
+Club.new #=> Club as a sport equipment.
+#stop#
+
+
+Golfový klub i golfová hůl se v angličtině označují stejným slovem club, a proto i obě dvě použité třídy nesou označení Club. Když v aplikaci chceme vytvořit novou instanci třídy Club, vyhrává ta třída, která je definována jako poslední. V našem případě je to třída Club, která reprezentuje golfovou hůl. Řešení výše vzniklého problému je velice jednoduché. Stačí využít moduly a použít je jako jmenné prostory. Každou třídu obalíme modulem, který ji uzavře do samostatného jmenného prostoru a tím umožní její jednoznačnou identifikaci v rámci aplikace.
+
+#start#
+module GolfUnit
+  class Club
+    # code for a club as a sport unit
+    def initialize
+      puts "Club as a sport unit."
+    end
+  end
+end
+
+module GolfEquipment
+  class Club
+    # code for a club as a sport equipment
+    def initialize
+      puts "Club as a sport equipment."
+    end  
+  end
+end
+
+GolfUnit::Club.new #=> Club as a sport unit.
+GolfEquipment::Club.new #=> Club as a sport equipment.
+#stop#
+
+
+Ke třídám uvnitř modulu se přistupuje pomocí dvojtečkové notace, kdy se nejdříve napíše název modulu, poté dvě dvojtečky a nakonec název třídy. Stejným způsobem by se přistupovalo i ke konstantám. Pouze pro přístup k metodám modulu lze využít klasické jednotečkové notace.
+
+###Mixiny
+
+Na začátku této podkalitoly pojednávající o modulech jsme uvedli, že moduly nemohou vytvářet své instance. Toto tvrzení samozřejmě platí i nadále. Jestliže ale moduly nemohou vytvářet instance, co se děje s instančními metodami definovanými uvnitř modulu? Moduly mají ještě jednu zásadní vlastnost, lze je namixovat (namíchat) do tříd. V tu chvíli přicházejí ke slovu instanční metody, které se rázem stávají instančními metodami třídy, do které je modul namixován. Pro namixování modulu do třídy se používá metoda include.
+
+#start#
+module Inspector
+  def about_me
+    puts "#{self.class.name}: #{self.to_s}"
+  end
+end
+
+class OrdinaryClass
+  include Inspector
+end
+
+OrdinaryClass.new.about_me 
+=> #OrdinaryClass: #<OrdinaryClass:0x1fdcdc0>
+#stop#
+
+
+Metoda include zajistí, že se instanční metody modulu stanou instančními metodami třídy. Je potřeba upozornit na to, že se do třídy nevkládá kód modulu, ale jen reference na modul. Změní-li se kód modulu, promítnou se tyto změny i do tříd, ve kterých je modul namixován.
+
+Využití modulů tímto způsobem představuje velkou felxibilitu. Jestliže jsme říkali, že Ruby nepodporuje vícenásobnou dědičnost, tak mixováním modulů do tříd, lze dosáhnout velice podobného efektu. Největší síla mixování modulů do tříd vyplouvá na povrch, pokud spolu kód třídy a modulu navzájem spolupracuje. Díky nejrůznějším modulům tak můžeme do třídy zadarmo získat funkcionalitu, jejíž implementace by nám zabrala nemalé množství času. Mixiny tak představují cestu, jak můžeme rozšiřovat funkcionalitu tříd velice transparentním způsobem. 
+
+Příkladem modulu ze standardní knihovny, který lze namixovat do třídy a získat téměř bez práce množství funkcionality je modul Comparable. Tento modul slouží pro porovnávání objektů a poskytuje následující metody pro porovnávání: <, <=, ==, =>, > a between?. Po třídě, do které je namixován vyžaduje pouze metodu <=>, která slouží pro porovnání dvou objektů. Porovnání dvou objektů a <=> b, může nabývat následujích hodnot:
+
+* -1: objekt a je menší než objekt b
+* 0: oba objekty jsou rovny
+* 1: objekt a je větší než objekt b
+
+#start#
+class Mountain
+  include Comparable
+  attr_reader :height
+  def initialize(name, height)
+    @name = name
+    @height = height
+  end
+  def <=>(other)
+    @height <=> other.height
+  end
+end
+
+mount_everest = Mountain.new("Mount Everest", 8848)
+snezka = Mountain.new("Sněžka", 1602)
+
+mount_everest < snezka #=> false
+mount_everest <= snezka #=> false
+mount_everest == snezka #=> false
+mount_everest > snezka #=> true
+mount_everest >= snezka #=> true
+#stop#

@@ -1,0 +1,11 @@
+Důležitým prvkem kultury kolem Ruby je testování. Ne snad, že by Ruby jako první přišlo s touto myšlenkou, to vůbec ne. Jednotkové testování tu bylo dlouho před Ruby a příslušné knihovny, které k tomuto účelu slouží, obsahuje snad každý jazyk. Zajímavé ale je, jak testování přijala komunita kolem jazyka Ruby. Průměrný vývojář v Ruby napíše více kódu, který testuje kód aplikace, než samotného kódu aplikace. Poměr se pohybuje v průměru asi 1:1,2<sup>1</sup> [[Confreaks2010]](/diplomova-prace/pouzita-literatura#sections). Tento údaj může být v mnoha ohledech zavádějící, přesto však mnohé vypovídá o využití principů testování. Není tedy určitě náhoda, že například framework Ruby on Rails v sobě přímo zahrnuje modul, který umožňuje vyvíjet dle principů TDD<sup>2</sup>. Testování ale není ani tak o nástrojích, jako o filosofii.
+
+Testování má ještě jeden důležitý dopad. Komunita kolem Ruby spolu velice úzce spolupracuje a ve velké míře se v aplikacích používají kusy kódu (patche, nebo celé knihovny), které vymyslel někdo jiný. O tom, jak velká je tato míra spolupráce, svědčí například úspěch serveru GitHub, který je v Ruby komunitě velice populární<sup>3</sup>. Díky důkladnému pokrytí testy, pak uživatel nemusí mít strach, že pokud převezme hotový kus kódu od někoho jiného, přestane mu fungovat jeho aplikace. Kdyby skutečně fungovat přestala, tak to pomocí testů hned odhalí.
+
+<hr />
+
+<sup>1</sup> Přesné označení tohoto ukazatele je Code to test ratio
+
+<sup>2</sup> Test Driven Development – programování řízené testy
+
+<sup>3</sup> GitHub je server, který kromě verzovacího nástroje Git poskytuje celou řadu nástrojů pro tzv. kolaborativní (sociální) vývoj aplikací. V době psaní této práce je v něm zaregistrováno 596 278 lidí a nachází se v něm 1 728 729 repozitářů [[GitHub2010]](/diplomova-prace/pouzita-literatura#sections)

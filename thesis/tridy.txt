@@ -1,0 +1,341 @@
+V Ruby je všechno objekt. Tato věta padla již na začátku celé práce a nic na tomto výroku nebudeme měnit. V dosavadních kapitolách jsme se zabývali základními konstrukcemi jazyka a seznamovali jsme se s různými objekty, které jsou v Ruby definovány. Doposud jsme však nepracovali s vlastními objekty. V této části práce bude představen jeden ze základních principů objektově orientovaného programování a to je tvorba vlastních objektů, tvorba vlastních tříd. Koncept objektů, tříd a instancí zde nebude vysvětlován. Předpokládá se, že čtenář je s těmito termíny seznámen a má je dostatečně zažité. Následující odstavce budou patřit tvorbě tříd v Ruby a všemu, co je se třídami v Ruby spojeno. To znamená, že se mimo jiné budeme zabývat syntaxí jejich zápisu, tvorbě instancí nebo například dědičností.
+
+Celá tato kapitola bude provázena jedním uceleným příkladem, na kterém bude vše názorně ukázáno a následně i dopodrobna vysvětleno. Příklad se bude týkat tvorby primitivního bankovního systému, resp. jen jeho části, která bude mít za úkol správu bankovních účtů. Vše je pro přehlednost kódu velice zjednodušeno, tak aby se zachovala názornost příkladů.
+
+V kapitole 2.4 Monkey patching jsme se zmiňovali o tom, že třídy v Ruby jsou definovány jako tzv. otevřené. To znamená, že třídu je možné za běhu aplikace modifikovat a například do ní přidávat metody. Této vlastnosti budeme využívat v následujících příkladech, v nichž bude uvedena pouze část kódu třídy modifikující třídu stávající. Tím pádem nebudeme muset uvádět celý kód třídy znovu. V příkladech bude tedy uváděn pouze kód, který do třídy přidáváme a tím rozšiřujeme nebo měníme její funkcionalitu.
+
+###Definice třídy a konstruktor
+
+Aplikace má sloužit pro správu bankovních účtů. První objekt, který bude mít svou reprezentaci v systému, bude tedy bankovní účet, který bude zastoupen třídou Account. U každého bankovního účtu budeme evidovat částku, která je na účtě uložena, číslo účtu a jméno vlastníka účtu. Pro zjednodušení celého příkladu je vlastník účtu reprezentován pouze textovým řetězcem, v reálu by to byl spíše samostatný objekt s řadou dalších údajů. Takto popsaná třída Account vypadá v Ruby následovně:
+
+#start#
+class Account       
+  def initialize(amount, account_number, owner)
+    @amount = amount
+    @account_number = account_number
+    @owner = owner
+  end
+end
+#stop#
+
+
+Třída se v Ruby definuje klíčovým slovem class, za nímž následuje název třídy s velkým počátečním písmenem. Pokud je název třídy víceslovný, používá se pro zápis velbloudí notace. Definice třídy končí klíčovým slovem end tak, jak je v Ruby zvykem uzavírat všechny bloky kódu. Jak je vidět, třída Account obsahuje pouze metodu initialize. Tato metoda má v Ruby speciální význam, jedná se totiž o konstruktor třídy. V Ruby se konstruktor nejmenuje stejně jako název třídy jak tomu je v Javě, ale pokaždé má stejný název initialize. 
+
+Poslední neznámou částí kódu jsou proměnné, které mají ve svém názvu jako první znak zavináč (@). Jedná se o proměnné instance. Jak jsme si již mohli všimnout, Ruby hojně využívá grafické výrazové prostředky ke zvýraznění určitých částí kódu. Tak jako například metody, které vrací hodnoty true nebo false, končí otazníkem, tak proměnné instance mají jako počáteční znak zavináč. Zatímco ale například otazník není ze syntaktického hlediska u názvu metod povinný, zavináč je u proměnných instance povinnou syntaktickou záležitostí. Pro znalce Javy může být ještě trošku matoucí, že proměnné instance nejsou nikde definovány a rovnou se používají. Toto je dáno dynamickými vlastnosmi jazyka. Jakmile jednou ve třídě použijeme proměnou se zavináčem (proměnou třídy), tato proměnná je automaticky dostupná v konextu celé třídy.
+
+###Tvorba instance a instanční metody (metody instance)
+
+Co nyní můžeme s třídou Account dělat? Jelikož jsme v této třídě definovali jedinou metodu a tou je kontruktor, nemůžeme s třídou dělat nic jiného, než vytvářet její instance1. S tvorbou instancí jsme se již setkali a tak to nebude nic nového:
+
+#start#
+account = Account.new(10_000, '123456789/0800', 'Porazil') 
+#=> "#<Account:0x1f518f0 @amount=10000,
+#=>  account_number=\"123456789/0800\", @owner=\"Porazil\">"
+#stop#
+
+
+Jak jsme již viděli dříve, instance se v Ruby tvoří pomocí třídní metody new, která následně pomocí kontruktoru vytvoří instanci dané třídy. Metoda new má stejné parametry jako konstruktor. Po vytvoření třídy v konzoli, můžeme vidět, že nám Ruby interpret vrátil jako návratovou hodnotu textovou reprezentaci dané třídy. Textovou reprezentaci dané třídy poskytuje metoda inspect, kterou dědí každá třída od třídy Object. Tuto metodu můžeme v dané třídě kdykoliv překrýt a upravit tak její výstup k obrazu svému.
+
+Nyní je na čase doplnit do třídy Account další funkcionalitu, aby dělala i něco užitečnějšího. Na každý bankovní účet by měly jít peníze vložit a zároveň by z něj opět měly jít vybrat. Ve třídě account definujeme instanční metodu deposit, která bude sloužit k ukládání peněz (zvýšení stavu účtu) a metodu withdraw, která bude sloužit k výběru peněz (snížení stavu účtu).
+
+#start#
+class Account
+
+  def withdraw amount
+    if @amount - amount > 0
+      @amount -= amount
+    else
+      raise 'There is not enough money to withdraw on the account.'
+    end
+  end
+
+  def deposit amount
+    @amount += amount
+  end
+
+end
+#stop#
+
+
+Metoda withdraw sloužící k výběru peněz nejdříve zjišťuje, zda je na účtě dostatečné množství peněz pro výběr. Pokud ano, příslušná částka se odečte z účtu. Pokud na účtě není dostatečné množství peněz pro výběr dané částky, aplikace vyhodí vyjímku. Více o vyjímkách viz [Thomas2004, str. 129]. Metoda deposit, která slouží pro vložení peněz na účet přičte danou částku k množství peněz, které již na účtu je. Použití metod poté vypadá následujícím způsobem (instanci třídy Account již máme vytvořenu z předchozích příkladů):
+
+#start#
+account.deposit(2_000) #=> 120000
+account.withdraw(8_000) #=> 4000
+account.withdraw(5_000) 
+#=> RuntimeError: On the account is not enough
+#=> money to withdraw.
+#stop#
+
+
+V kapitole 2.12 Metody jsme si říkali, že každá metoda v Ruby vrací hodnotu i když neuvedeme klíčové slovo return a že touto hodnotou je výsledek vyhodnocení posledního řádku (výrazu) v metodě. Přesně tohoto principu můžeme využít při testování funkčnosti třídy Account. Poslední řádky metod deposit a withdraw nám totiž vrací vypočtené množství peněz na účtě (peněžní zůstatek). Po použití každé z těchto metod tedy ihned vidíme, jaký měla vliv na množství peněz na účtě. Poslední výběr peněz z účtu skončí vyjímkou, protože na účtě není dostatečné množství peněz pro takto vysoký výběr.
+
+###Přístupové metody
+
+Nyní tedy máme třídu Account, jejíž instance v sobě dokáží uchovávat informace o stavu účtu, číslo účtu a jméno vlastníka účtu. Kromě toho jsme schopni na účet ukládat a vybírat z něj peníze. Zatím však nemáme možnost, kdykoliv se zeptat jaké množství peněz na účtě je. Tato informace je sice uložena v proměnné instance @amount, avšak k proměnným instance nelze z vnějšku třídy přistupovat. Metoda, která by přistupovala k proměnné instance a vracela by její hodnotu by vypadala jednoduše takto:
+
+<pre class='nomargin'><textarea class='code'>
+def amount
+  @amount
+end
+</textarea></pre>
+
+Protože je potřeba přístupu k proměnným instance z vnějšku třídy poměrně častá, existuje v Ruby zjednodušený zápis, který přístupové metody generuje automaticky. Kromě zůstatku na účtu budeme chtít mít z vnějšku třídy přístup i ke jménu majitele účtu a k číslu účtu. K definici přístupových metod pro čtení proměnných instance slouží metoda attr_reader:
+
+#start#
+class Account
+  attr_reader :account_number, :owner, :amount  
+end
+#stop#
+
+
+Metoda attr_reader neudělá nic jiného, než že v pozadí vygeneruje stejné přístupové metody, které bychom definovali my. V pozadí se tedy vygeneruje kód, který je velice podobný tomutu:
+
+
+<pre class='nomargin'><textarea class='code'>
+def account_number
+  @account_number
+end
+ 
+def owner
+  @owner       
+end    
+ 
+def amount
+  @amount
+end
+</textarea></pre>
+
+Výsledek naší změny můžeme ihned otestovat na naší instanci třídy Account. Měli bychom být nyní schopni přistupovat ke všem informacím, které jsme do instance vložili, když jsme ji vytvářeli. Stav účtu se díky našim zásahům již samozřejmě změnil:
+
+#start#
+account.account_number #=> "123456789/0800"
+account.owner #=> "Porazil"
+account.amount #=> 4000
+#stop#
+
+
+Nyní máme přístup ke všem proměnným instance a můžeme je číst. Můžeme je pouze číst a nemůžeme měnit jejich hodnoty. Tento stav je žádoucí, protože nechceme, aby bylo možné z venku třídy měnit částku, která je uložena na účtě. Pro manipulaci s množstvím peněz na účtě slouží pouze metody deposit a withdraw. Můžeme chtít ale změnit majitele účtu a změnit tak obsah proměnné @owner. Nejdříve si ukážeme, jak by vypadala naše vlastní metoda, která by tuto operaci umožnila a hned v zápětí si ukážeme konstrukt, který je pro tento případ definován v Ruby. Naše vlastní metoda by vypadala takto:
+
+<pre class='nomargin'><textarea class='code'>
+def owner=(value)
+  @owner = value       
+end
+</textarea></pre>
+
+Důležité je všimnout si názvu metody, která v sobě zahrnuje znak přiřazení. Metoda se jmenuje owner=. My ale opět tuto metodu nemusíme definovat sami a můžeme využít metody attr_writer, která za nás tuto metodu vygeneruje:
+
+#start#
+class Account
+  attr_writer :owner
+end
+#stop#
+
+
+Metoda attr_writer vygenerovala metodu, pomocí níž lze nyní změnit hodnotu proměnné @owner. Funkčnost této metody můžeme opět ihned ověřit. Nejdříve vypíšeme současnou hodnotu proměnné @owner, poté změníme její hodnotu a nakonec opět její hodnotu vypíšeme, abychom zjistili, že se změna opravdu uskutečnila:
+
+#start#
+account.owner #=> "Porazil"
+account.owner = 'Novák'
+account.owner #=> "Novák"
+#stop#
+
+
+Kromě metod attr_reader a attr_writer, existuje v Ruby ještě jedna velice podobná metoda, kterou je attr_accessor. Jesliže attr_reader vytváří metody pro čtení instančních proměnných a attr_writer metody pro změnu jejich hodnot, pak attr_accessor je kombinací obojího. Jinými slovy attr_accesor vytváří jak metody pro čtení, tak metody pro zápis.
+
+###Dědičnost
+
+Koncept dědičnosti patří k základním myšlenkám objektově orientovaného programování a tak tu nebude vysvětlována jeho podstata ani důvody pro jeho zavedení. Ruby (stejně jako Java) podporuje pouze jednoduchou dědičnost. To znamená, že potomek může mít pouze jednoho rodiče. Principu podobnému vícenásobné dědičnosti je možné dosáhnout pomocí modulů a tzv. mixinů, více v kapitole 2.14 Moduly.
+
+Budeme pokračovat v našem příkladu s bankovními účty. Máme zapracovat požadavek, který říká, že kromě běžných účtů, je možné mít i kreditový účet. Rozdíl mezi běžným a kreditovým účtem spočívá v tom, že na kreditovém účtu lze jít do záporných hodnot, za jejichž nesplacení se následně platí úroky. Kreditový účet je v podstatě úvěrový účet. Obrazem kreditového účtu v naší aplikaci bude třída CreditAccount, která bude potomkem třídy Account:
+
+#start#
+class CreditAccount < Account
+  def initialize(account_number, owner, credit_amount)
+    super(0, account_number, owner)
+    @credit_amount = credit_amount
+  end   
+end
+#stop#
+
+
+Na tomto příkladu jsou vidět dvě důležité věci. První věcí, která stojí za povšimnutí, je způsob, jakým se v Ruby zapisuje dědičnost. Pro zápis se používá znak menšítka (<), které znázorňuje šipku směřující od rodiče k potomkovi, CreditAccount < Account. Tento zápis říká, že třída CreditAccount je potomkem třídy Account. Druhou věcí, na kterou upozorníme je metoda super, která se nachází uvnitř metody initialize. Tato metoda zavolá metodu se stejným názvem v rámci rodiče dané třídy. V tomto případě se zavolá metoda initialize, která je definována ve třídě Account. Děje se tak mimo jiné proto, aby docházelo k co nejmenšímu opakování stejných částí kódu a byl tak dodržen princip DRY1.
+
+Třída CreditAccount zavádí oproti své rodičovksé třídě navíc jednu proměnnou instance @credit_amount, která představuje maximální možný limit, do kterého lze čerpat úvěr. Výchozí hodnota pro zůstatek na účtu je automaticky stanovena na nulu.
+
+Podívame-li se na metodu withdraw sloužící pro výběr z účtu, zjistíme, že tak jak je definována ve třídě Account, je pro potřeby ve třídě CreditAccount nepoužitelná. Metoda totiž neumožňuje uskutečnit výběr peněz, pokud by byl zůstatek na účtě po výběru menší než nula. Pricnip kreditového účtu je ale přesně opačný a je založen právě na výběrech, které jdou do záporných hodnot. Metodu withdraw musíme tedy ve třídě CreditAccount překrýt a implementovat ji tak, aby umožňovala záporný výběr z účtu až do stanovaného limitu:
+
+#start#
+class CreditAccount < Account  
+  def withdraw amount
+    if @credit_amount +@amount - amount > 0 
+      @amount -= amount
+    else
+      raise 'You reached your credit account limit.'
+    end            
+  end
+end
+#stop#
+
+
+Vytvoříme instanci třídy CreditAccount a otestujeme, zda je metoda withdraw implementována podle našich předtav:
+
+#start#
+credit_account = CreditAccount.new(
+  '987654321/0800', 'Porazil', 20_000
+) 
+credit_account.withdraw(10_000) #=> -10000
+credit_account.withdraw(15_000)
+#=> RuntimeError: You reached your credit account limit.
+#stop#
+
+
+###Konstanty
+
+Záporný zůstatek na kreditovém účtu nemůže být napořád a po uplynutí určité doby, se platí jako penále úroky z dlužného částky. My se zde pro zjednodušení nebudeme zabývat sledováním časových období, ale chceme být schopni získat hodnotu úroků. Úroky se počítají jako procenta z dlužné částky. Jako první tedy zavedeme do naší třídy úrokovou míru:
+
+#start#
+class CreditAccount < Account
+  INTEREST_RATE = 1.5  
+end
+#stop#
+
+
+Úrokovou míru jsme definovali jako konstantu s názvem INTEREST_RATE a přiřadili jsme jí hodnotu 1,5 jako 1,5%. Konstanty v Ruby začínají velkým počátečním písmenem (to je syntaktická nutnost, tak interpret rozezná konstanty od běžných proměnných), je však velice obvyklé, že je název konstant tvořen pouze velkými písmeny a u víceslovných názvů se mezery nahrazují podtržítky. Konstanty jsou dostupné i mimo vlastní třídu a přistupuje se k nim následujícím způsobem:
+
+#start#
+CreditAccount::INTEREST_RATE #=> 1.5
+#stop#
+
+
+Konstanty mají v Ruby jednu malou a velice nepříjemnou vlastnost. Hodnota konstanty lze za běhu programu změnit a program neskončí chybou. Je pravda, že při změně konstanty je vráceno varování, ale to je vše a nová hodnota se do konstanty bez větších problémů uloží. Ukázka změny hodnoty konstanty:
+
+#start#
+MY_CONSTANT = 'constant value' #=> 'constant value'
+MY_CONSTANT = 'more constant value' 
+#=> warning: already initialized constant MY_CONSTANT 
+#=> 'more constant value'
+#stop#
+
+
+###Virtuální atributy
+
+Definovanou konstantu INTEREST_RATE nyní můžeme využít pro výpočet úroků z dlužné částky. Úroky budeme definovat jako tzv. virtuální atribut. Vysvětlení toho, co jsou to virtuální atributy, bude následovat až po uvedení příkladu, aby bylo vše na čem vysvětlovat. Úroky z dlužné částky získáme následujícím způsobem:
+
+#start#
+class CreditAccount < Account
+  def interest
+    return 0 unless @amount < 0
+    return (@amount * INTEREST_RATE/100).round(2).abs
+  end    
+end
+#stop#
+
+
+Pokud zůstatek na účtě není menší než nula, úroky jsou nulové. Jakmile je ale zůstatek na účtě větší než nula, jsou z této částky počítány úroky na základě definované úrokové míry. Částka je poté ještě zaukrouhlena na dvě desetinná místa a je z ní získáno absolutní číslo, aby výsledek nebyl se záporným znaménkem. Nyní můžeme zjistit, kolik činí úroky z dlužné částky:
+
+#start#
+credit_account.amount #=> -10000
+credit_account.interest #=> 150
+#stop#
+
+
+Úroky z dlužné částky 10 000 Kč činí 150 Kč, což je při úrokové míře 1,5% správný výsledek. Pro získání úroku byl využit virtuální atribut interest. Ve skutečosti je interest metoda a nyní si vysvětlíme, proč se v Ruby některým metodám říká atributy a některým virtuální atributy.
+
+Když vytváříme třídu, rozhodujeme se nad tím, jakým způsobem bude zachycen vnitřní stav třídy a jak bude tento stav reprezentován navenek (jak budou se třídou spolupracovat ostatní třídy). Zatímco vnitřní stav třídy je uchováván v instančních proměnných, vnější stav třídy je reprezentován pomocí atributů. Metody třídy pak definují akce, které lze se třídou provádět. Je důležité si uvědomit, že se třídami se v Ruby komunikuje pouze prostřednitvím metod, protože všechny proměnné instance jsou v Ruby viditelné pouze v kontextu dané instance a z vnějšku k nim lze přistupovat pouze prostřednictvím metod. Rozdělení metod na atributy, které představují stav třídy, a metody, které představují opravdové akce, tak přispívá k pochopení tříd a jakým způsobem s nimi lze pracovat.
+
+Nyní se konečně dostáváme i k virtuálním atributům. Virtuální atributy jsou podmnožinou atributů. Klasické atributy představují pouze převod vnitřního stavu třídy (proměnné instance) do vnějšího prostředí. Virtuální atributy na rozdíl od těch klasických nemají svou vnitřní reprezentaci a často jsou získávány výpočtem nebo nějakým složitějším postupem. Jinými slovy virtuální atributy navenek představují stav třídy, uvnitř třídy však nemají svou reprezentaci a jsou odvozeny z ostatních vnitřních stavů. Stejně tak je tomu v našem případě, kdy virtuální atribut interest nemá ve třídě svou vnitřní reprezentaci a je odvozen na základě zůstatku na účtě (@amount) a úrokové míry (INTEREST_RATE).
+ 
+Ve svém důsledku se jedná pouze o terminologii, která je navíc závislá na subjektivním vnímání. Výše uvedené rozdělení vychází z [Thomas2004, str. 30] a autor této práce se s tímto rozdělením plně ztotožňuje.
+
+###Proměnné třídy a metody třídy
+
+Prozatím jsme hovořili pouze o atributech a metodách, které se pojili přímo s konkrétními instancemi objektů. Může ale nastat situace, kdy budeme chtít, aby byla určitá vlastnost sdílena napříč všemi instancemi určitého objektu. To je chvíle, kdy přicházejí na řadu proměnné třídy a metody třídy. Jedná se o metody, které se nepojí s konkrétní instancí, ale jsou definovány přímo ve třídě, ze které se instance tvoří. Tím, že nejsou svázány s konkrétní instancí, jim umožňuje, aby byly sdíleny skrz všechny instance objektu. Proměnné třídy i třídní metody se samozřejmě používají i v Javě a nejedná se tedy o žádný nový konstrukt, se kterým by přišlo až Ruby.
+
+#start#
+class Person
+  @@number_of_people = 0 
+  def initialize
+    @@number_of_people += 1
+    puts "New great person was created."
+  end
+  def Person.number_of_people
+    @@number_of_people
+  end
+end
+#stop#
+
+
+Jestliže se proměnné instance tvoří pomocí jednoho zavináče, pak třídní proměnné se tvoří pomocí dvou zavináčů. @@number_of_people je tedy třídní proměnou třídy Person. Námi definovaná proměnná třídy slouží k zachycení počtu vytvořených instancí třídy Person. Pokaždé, když se vytvoří nová instance, tak je hodnota proměnné @@number_of_people zvýšena o jedničku.
+
+Třídní proměnné jsou viditelné pouze uvnitř třídy a jejích instancí. Pokud chceme zvnějšku zjistit hodnotu proměnné @@number_of_people, musíme vytvořit třídní metodu, která nám vrátí její hodnotu. Z tohoto důvodu jsme vytvořili metodu Person.number_of_people. Třídní metody se tvoří tak, že nejdříve uvedeme název třídy a za tečkou poté název metody. Použití třídy Person vypadá následujícím způsobem:
+
+#start#
+Person.number_of_people #=> 0
+Person.new #=> New great person was created.
+Person.new #=> New great person was created.
+Person.new #=> New great person was created.
+Person.number_of_people #=> 3
+#stop#
+
+
+Pro úplnost je ještě potřeba uvést, že pro vytváření třídních metod existuje více způsobů zápisu. Jedním možným zápisem je uvádět před název metody název třídy. Tento způsob jsme použili v našem příkladu. Druhým a velice častým způsobem je zápis, v němž se název třídy nahradí klíčovým slovem self. Výraz self odkazuje na objekt, v jehož kontextu byl použit. Definice metody třídy pomocí klíčového slova self by pak vypadala takto:
+
+#start#
+class Person
+  def self.number_of_people
+    @@number_of_people
+  end
+end
+#stop#
+
+
+###Modifikátory přístupu
+
+Když vytváříme třídu, vždy dojdeme do momentu, ve kterém se rozhodujeme, které části třídy budeme chtít mít viditelné pro okolí a naopak, které budeme chtít, aby byly před okolím skryty. Vytváříme tak rozhraní třídy pomocí, kterého lze s danou třídou komunikovat. Provázanost tříd a jejich vzájemná závislost na implementačních detailech by měla být co nejmenší. Třídy by měly být závislé pouze na poskytnutém rozhraní a i to by mělo být navrženo tak, aby umožňovalo změnu implementace třídy, aniž by muselo dojít ke změně kódu tříd, které jsou na tomto rozhraní závislé.
+
+Jelikož se v Ruby nedá z vnějšku přistupovat k proměnným ve třídě, rozhraní třídy je definováno pouze prostřednitvím metod, které třída poskytuje svému okolí. Viditelnost metod lze nastavit pomocí tří příkazů:
+
+* public: Takto označené metody mohou být používány kýmkoliv. Žádné omezení přístupu není aplikováno. Všechny metody jsou ve výchozím stavu veřejné, neboli public. Jedinou vyjímku tvoří metoda initialize, která je automaticky označena modifikátorem přístupu private.
+* private:  Metody označené tímto modifikátorem jsou soukromé. Takovéto metody mohou být volány pouze v kontextu daného objektu. Žádný jiný objekt ani třída nemá právo k těmto metodám přistupovat, dokonce ani objekt, který je odvozen od stejné třídy.
+* protected:  K takto označeným metodám je přístup pouze v rámci daného objektu a v rámci potomků tohoto objektu.
+
+Ruby je dynamickým jazykem ve všech svých aspektech a ne jinak je tomu i při vyhodnocování přístupu k metodám. K vyhodnocování dochází dynamicky až za běhu programu a ne při překladu, tak jak to bývá běžné ve statických programovacích jazycích. Nelze tedy například předem odhalit, zda je v programu volána metoda, ke které nelze přistupovat.
+
+Modifikátory přístupu je možné použít dvěma různými způsoby. Prvním způsobem je jejich použití bez argumentů, kdy je každá následující metoda podřízena daným přístupovým pravidlům. Použití si ukážeme na následujícím příkladu:
+
+<pre class='nomargin'><textarea class='code'>
+Class MyClass  
+  def method_public_by_default
+  end
+  private
+    def private_method
+    end
+  protected
+    def protected_method
+    end
+  public
+    def another_public_method
+    end
+end
+</textarea></pre>
+
+Druhým možným způsobem použití, je vypsání názvů metod, které se mají řídit danými přístupovými pravidly jako argumentů za přístupovou metodu. Jako argumenty se uvádějí názvy metod ve tvaru symbolů. Pokud vám to není jasné, podívejte se na následující příklad, který je ekvivalentem příkladu výše:
+
+<pre class='nomargin'><textarea class='code'>
+Class MyClass
+  private :private_method
+  protected :protected_method
+ 
+  def method_public_by_default
+  end
+  def private_method
+  end
+  def protected_method
+  end    
+  def another_public_method
+  end
+end
+</textarea></pre>
+
+Metody, které chceme, aby zůstaly veřejné (modifikátor přístupu public), nemusíme žádným způsobem označovat, protože jak jsme si říkali na začátku této subkapitoly, metody jsou veřejné samy od sebe (ve výchozím nastavení).

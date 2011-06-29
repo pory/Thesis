@@ -1,0 +1,8 @@
+Práce představuje jazyk Ruby a zabývá se myšlenkou, zda by mělo smysl zařadit tento jazyk do výuky informatiky na Vysoké škole ekonomické v Praze (VŠE). Na začátku studia musejí všichni studenti informatiky povinně absolvovat dva předměty týkající se programování, kdy pro mnohé z nich je to vůbec jejich první seznámení s programováním. V současné době je jako primární programovací jazyk vyučována Java. Tato práce si klade za cíl představit čtenáři jazyk Ruby, jako alternativu k současné době vyučovanému jazyku Java nebo alespoň jako jazyk, kterým je možné na studium Javy navázat.
+
+V úvodu práce je čtenář seznámen s historií jazyka, s filosofií, která stála u jeho zrodu a se základními koncepty, na kterých je postaven. Dále jsou představeny základní konstrukty a syntaxe jazyka nutné pro pochopení závěrečné části práce, která pojednává o různých programovacích technikách, které lze v Ruby použít. Závěrečná kapitola vyzdvihuje vlastnosti Ruby, pro které by jej bylo vhodné zařadit mezi vyučované jazyky na VŠE. Jedná se zejména o jasnou a stručnou syntaxi, možnost využít různých programovacích paradigmat a tvorbu interních DSL.
+
+Praktickým výstupem z celé práce je webová aplikace, nabízející interaktivní podobu práce samotné. Celou práci je tak možné procházet na internetu a všechny uvedené příklady programového kódu ihned vyzkoušet v praxi. Aplikace nastiňuje možný směr, kterým se může ubírat výuka programovacích jazyků.
+
+###Klíčová slova
+Ruby, Java, programování, výuka programování

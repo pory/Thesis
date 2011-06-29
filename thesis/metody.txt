@@ -1,0 +1,90 @@
+Metody patří k základním stavebním blokům každého programu. Není proto divu, že jsme se s metodami setkali již daleko dříve před toutu kapitolou. Různé metody byly použity v mnohých příkladech uvedených v této práci. Nyní se podíváme na metody trošku podrobněji, vysvětlíme si jejich syntaktický zápis a to jak se s nimi pracuje. Je nutné sjednotit terminologii a zmínit, že pro odlišení parametrů u metod je použita konvence převzatá z aglicky psané literatury. To znamená, že jsou formální parametry metod označovány jako parametry a skutečné parametry metod jsou označovány jako argumenty.
+
+Jako první se nabízí srovnání metod tak, jak je známe z Javy, s metodami v Ruby. Pustíme se tedy hned do příkladu. Představme si metodu, která nedělá nic jiného, než že dokáže spočítat obsah plochy obdelníku. V Javě by zápis takové metody vypadal takto:
+
+#start#
+public int computeRectangleArea(int width, int height) {
+  return width * height;
+}
+#stop#
+
+
+Metoda, která by měla stejnou funkcionalitu by se v Ruby zapsala takto:
+
+#start#
+def compute_rectangle_area(width, height)
+  return width * height
+end
+#stop#
+
+
+Všimnout bychom si měli v první řadě faktu, že u metody v Ruby chybí modifikátor přístupu. Viditelnost metod uvnitř tříd se určuje pomocí speciálních bloků. Bez použití modifikátoru přístupu je metoda viditelná stejně, jako v Javě při použití klíčového slova public. Teď se toutu problematikou nebudeme více zabývat. Pojednává o ní samostatná kapitola 2.13.8 Modifikátory přístupu. Druhým klíčovým slovem v zápisu metody v Javě je slovo int, které označuje datový typ hodnoty, jež metoda vrací. I tuto část, bychom u metody v Ruby marně hledali. Může to znít zvláštně, ale v Ruby každá metoda vrací hodnotu. Dokonce i v případě, že není použito klíčové slovo return, metoda vrací hodnotu. Touto hodnotou je hodnota posledního vyhodnoceného výrazu. Je už pouze na programátorovi, zda hodnotu, kterou metoda vrací, využije nebo ne. Výše uvedená metoda v Ruby by tak měla stejný význam, i kdyby tělo metody neobsahovalo slovo return, ale pouze samotný výpočet. Z toho samozřejmě vyplývá, že bychom v Ruby stejně marně hledali i ekvivalent klíčového slova void, které se používá v Javě, protože jednoduše není třeba.
+
+Po probrání odlišností mezi Javou a Ruby se již můžeme zaměřit pouze na Ruby. Nejjednoduší zápis metody v Ruby je tvořen pouze klíčovým slovem def a názvem metody. Názvy metod začínají malými písmeny a je nepsaným pravidlem, že se u víceslovných názvů používá podtržítková notace. V názvech metod se může objevit i otazník nebo vykřičník. Metody, které končí otazníkem, obvykle vrací jako hodnotu true nebo false. Metody končící vykřičníkem obvykle označují nebezpečné metody nebo metody, které přímo modifikují svého příjmemce. Za návěstím metody následuje tělo metody a ta je pak celá uzavřena klíčovým slovem end.
+
+Pokud chceme definovat metodu, která bude přijímat parametry, uvádějí se názvy parametrů za název metody a jednotlivé parametry se oddělují čárkou. Parametry mohou být uzavřeny do kulatých závorek (tak jako je to u výše uvedeného příkladu), ale nemusí. Ekvivalentní zápis metody pro výpočet obsahu plochy obdelníku bez závorek kolem argumentů a bez klíčového slova return pak vypadá takto:
+
+#start#
+def compute_rectangle_area width, height
+  width * height
+end
+#stop#
+
+
+V Ruby je možné definovat implicitní hodnoty argumentů metody. Jinými slovko lze interpretovat tak, že metodu, která má definované výchozí hodnoty pro své argumenty, je možné zavolat i bez těchto argumentů. Výchozí hodnoty pro argumenty se definují jednoduše přiřazením hodnoty do argumentu pomocí operátoru =.  Podívejte se na následující příklad, po jehož shlédnutí bude snad vše trošku jasnější:
+
+#start#
+def display_cool_people(person1 = "Dave Thomas",
+  person2 = "Chad Fowler",person3 = "Andy Hunt")
+
+  "These people are cool: #{person1}, #{person2}, #{person3}!"
+end
+
+display_cool_people 
+#=> These people are cool: Dave Thomas, Chad Fowler, Andy Hunt!
+display_cool_people("David Hansson")
+#=> These people are cool: David Hansson, Chad Fowler, Andy Hunt!
+display_cool_people("David Hansson", "Sam Ruby")
+#=> These people are cool: David Hansson, Sam Ruby, Andy Hunt!
+display_cool_people("David Hansson", "Sam Ruby", "Obie Fernandez") 
+#=> These people are cool: David Hansson, Sam Ruby, Obie Fernandez!
+#stop#
+
+###Pojmenované argumenty
+
+Namísto obyčejných argumentů se v Ruby v hojné míře používají tzv. pojmenované argumenty1. Ruby sice tento druh argumentů přímo nepodporuje2, ale komunita si pomohla použitím asociativních polí. Ve své podstatě jde o to, aby bylo možné zadávat argumenty do metod v libovolném pořadí a množství. Argumenty jsou pak uvnitř metody zpracovány na základě svého jména. Asociativní pole jsou k tomuto účelu přímo ideální, protože jako názvy argumentů se používají symboly. Při volání metody ani nemusíme vytvářet instanci třídy Hash pomocí literálu, ale stačí pouze definovat klíče a hodnoty a Ruby z nich již asociativní pole vytvoří automaticky. Zdá se to jako drobnost, ale zápis je pak o dvě složené závorky chudší a tím pádem i čitelnejší. Následující příklad ukazuje využití asociativních polí, jako pojmenovaných argumentů. Ve volání metody je pak v prvním případě asociativní pole vytvořeno pomocí literálu a v druhém případě pomocí úspornějšího zápisu.
+
+#start#
+def display_country_info(country = {})
+  puts "Population of the #{country[:name]}
+       is #{country[:population]}."
+end
+
+display_country_info({
+  :name => "Czech Republic", :population => 10_500_000
+}) 
+#=> Population of the Czech Republic is 10500000.
+
+display_country_info(
+  :name => "Czech Republic", :population => 10_500_000
+) 
+#=> Population of the Czech Republic is 10500000.
+#stop#
+
+
+###Libovolný počet argumentů
+
+Při tvorbě metody se můžeme dostat do situace, kdy nevíme, kolik argumentů by metoda měla být schopna přijmout. Ruby nám v takovémto případě poskytuje syntaktickou pomůcku. Před název argumentu stačí uvést hvězdičku (*) a s argumentem bude uvnitř metody automaticky nakládáno jako s polem. Při volání metody ovšem žádné pole vytvářet nemusíme a můžeme psát jeden argument za druhým. Použití je vidět na následujícím příkladu:
+
+#start#
+def store_programming_languages(*languages)
+  puts "Languages class is #{languages.class}."
+  puts "Stored languages are #{languages.join(", ")}."
+end
+
+store_programming_languages(
+  "Ruby", "Scala", "Python", "Java", "Lisp"
+)
+#=> Languages class is Array.
+#=> Stored languages are Ruby, Scala, Python, Java, Lisp.
+#stop#

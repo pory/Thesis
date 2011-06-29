@@ -1,0 +1,356 @@
+V přecházející kapitole jsme se krátce seznámili se základními rozdíly mezi Javou a Ruby. Byly vyzdviženy nejpatrnější rozdíly v syntaxi a představen pricnip dynamického typování. I když se v Ruby datové typy nedefinují staticky tak jako například v Javě, neznamená to, že by nebyly důležité, nebo že by dokonce nebyly potřeba. Stejně jako Java i Ruby obsahuje své interní datové typy pro čísla, řetězce, pole, asociativní pole a další a právě o těchto datových typech pojednává tato kapitola.
+
+###Čísla
+Ruby jako většina programovacích jazyků podporuje dva základní druhy čísel. Celá čísla a desetinná čísla. Může pak být trošku matoucí, že pro čísla existují v Ruby tři datové typy. Dva datové typy pro celá čísla a jeden datový typ pro čísla desetinná. Celá čísla mohou být jakéhokoliv rozsahu, vše záleží pouze na volné paměti. Celá čísla (obvykle) v rozsahu od -2<sup>30</sup> do 2<sup>30</sup> - 1 nebo -2<sup>62</sup> do 2<sup>62</sup> - 1 jsou interně uloženy v binární podobě a jsou reprezentovány instancí třídy Fixnum<sup>1</sup>. Čísla, která jsou mimo tento interval, jsou pak reprezentována instancí třídy Bignum. Programátor se však nemusí starat o to, jaký konkrétní datový typ je použit, protože je od všeho odstíněn a převod mezi těmito dvěma typy probíhá automaticky bez jeho vědomí. Automatický převod ilustruje následující příklad:
+
+#start#
+number = 99
+5.times do 
+  puts "Number is #{number} and its class is #{number.class}"
+  number *= number
+end
+#stop#
+
+
+Výsledek
+
+<pre class='code-output'>
+Number is 99 and its class is Fixnum
+Number is 9801 and its class is Fixnum
+Number is 96059601 and its class is Fixnum
+Number is 9227446944279201 and its class is Fixnum
+Number is 85145777109487563964501441198401 and its class is Bignum
+</pre>
+
+Ruby neomezuje programátory pouze na práci s čísly v desítkové soustavě. Desítková soustava je jen výchozí. Pro zapsání čísla v jiné číselné soustavě stačí jen k číslu jako prefix uvést symbol příslušné číselné soustavy. Osmičková číselná soustava má prefix 0, binární má prefix 0b, hexadecimální 0x a desítková, která je výchozí pak 0d:
+
+#start#
+125 #=> 125 #desítková číselná soustava
+0d125 #=> 125 #desítková číselná soustava
+0b1111101 #=> 125 #binární číselná soustava
+0175 #=> 125 #osmičková číselná soustava
+0x7d #=> 125 #hexadecimální číselná soustava
+#stop#
+
+
+Pro větší přehlednost je možné celá čísla zapisovat s podtržítky. Pokud je číslo moc dlouhé a je tím snížena jeho čitelnost, je možné využít podtržítek namísto mezer<sup>2</sup>, které se používají v běžném textu. Podtržítka jsou interpretem jednoduše ignorována a ten k nim přistupuje jako k běžným číslům. Je tak možné celá čísla zapsat následujícím způsobem:
+
+#start#
+12_000_000 #=> 12000000
+1_500 + 2_500 #=> 4000
+#stop#
+
+
+Celá čísla obsahují navíc pár velice užitečných iterátorů. Jeden z nich byl už použit u příkladu výše, když jsme chtěli demonstrovat automatický převod mezi datovými typy. Iterátor nedělá nic jiného, než že opakovaně na jednotlivé prvky spouští blok kódu, který mu byl poskytnut. Tyto iterátory tedy vždy pracují s bloky kódu jako parametrem. Nejběžněji používané iterátory pro celá čísla:
+
+#start#
+3.times { print "Ahoj! " } #=> Ahoj! Ahoj! Ahoj!
+1.upto(5) { |i| print i, " " } #=> 1 2 3 4 5
+5.downto(1) { |i| print i, " " } #=> 5 4 3 2 1
+5.step(25, 5) { |i| print i, " " } #=> 5 10 15 20 25
+#stop#
+
+
+Kromě celých čísel Ruby obsahuje samozřejmě i desetinná čísla. Pro desetinná čísla slouží v Ruby třída Float. Zápis desetinných čísel je možný dvěma různými způsoby. První zápis je pomocí desetinné tečky. Druhý zápis je pomocí specifikace desítkového exponentu, která se zapíše za znak e. Před znakem e se vždy musí vyskytovat číslo, jinak by interpret tento zápis vyhodnotil jako volání metody1. Desetinná čísla se pak zapisují takto:
+
+#start#
+156.48 #=> 156.48
+1.5648e2 #=> 156.48
+#stop#
+
+Převod mezi jednotlivými číselnými datovými typy se odehrává automaticky, je tak možné udělat například následující zápis:
+
+#start#
+1.5648e2 + 3.52 + 40 #=> 200.0
+#stop#
+
+###Řetězce
+
+Datovým typem, který se vyskytuje jak v Javě, tak v Ruby, je řetězec. Stejně jako v Javě, tak i v Ruby, jsou řetězce instancemi třídy String. Na rozdíl od Java jsou v Ruby třídou String reprezentovány nejen řetězce, ale i znaky. Těžko bychom tedy v Ruby hledali datový typ char nebo jemu podobný, který existuje v Javě. Řetězce jsou většinou tvořeny tisknutelnými znaky, ale nemusí tomu tak být vždy. Mimo jiné mohou řetězce obsahovat i binární data, které představují netisknutelné znaky. Binární data by se však do řetězců špatně zadávala a tak se místo nich používají tzv. escape sekvence, které jsou pak nahrazeny při překladu korespondujícími binárními kódy.
+
+Nejběžnějším způsobem, jak vytvořit v Ruby řetězec je pomocí literálu. Řetězec je možné samozřejmě také vytvořit jako instanci třídy String, ale s tímto přístupem se téměř není možné setkat. Oba dva následující řádky kódu jsou tak ekvivalentní:
+
+#start#
+puts "This is my first string" #=> This is my first string
+String.new("This is my first string") #=> This is my first string
+#stop#
+
+
+Jak je uvedeno výše, řetězec se v Ruby tvoří nejčastěji pomocí literálu. Literál je posloupnost znaků, která je z každé strany ohraničena oddělovačem. V Ruby existuje celkem pět možných způsobů, jak vytvořit řetězec, resp. existuje pět různých druhů oddělovačů. Použitý oddělovač určuje, jakým způsobem budou zpracovány speciální znaky uvnitř řetězce. Nejjednodušším oddělovačem je apostrof (nejrychlejší zpracování řetězce). Uvnitř řetězce ohraničeného apostrofy se dvě zpětná lomítka nahradí jedním a zpětné lomítko následované apostrofem se nahradí apostrofem:
+
+#start#
+puts 'This is my single quoted string with backslash "\\"' 
+#=> This is my single quoted string with backslash "\"
+puts 'That\'s my second single quoted string with apostrophe' 
+#=> That's my second single quoted string with apostrophe
+#stop#
+
+
+Řetězce tvořeny uvozovkami umožňují navíc vkládání escape sekvencí. Nejznámněší z nich je \n, která představuje kód pro vložení nového řádku. Seznam všech použitelných escape sekvencí je možné nalézt napříkad v [[Thomas2004, str. 306]](/diplomova-prace/pouzita-literatura#sections). Kromě možnosti vkládání netisknutelných znaků, je možné do řetězce vložit libovolný Ruby výraz mezi znaky #{výraz}. Pokud vkládáme proměnnou instance, třídy nebo globální proměnnou, pak nemusíme používat složené závorky a proměnou můžeme psát rovnou za znak #. Kód je vyhodnocen a připojen k řetězci, jak můžeme vidět na následujícím příkladu:
+
+#start#
+puts "Current date and time is #{ Time.now }" 
+#=> Current date and time is Thu Feb 24 08:57:14 +0100 2011
+#stop#
+
+
+#start#
+# $0 je globální proměnná, která označuje právě probíhající program
+puts "Program which is running is #$0" 
+#=> Program which is running is irb
+#stop#
+
+
+Existují ještě tři další způsoby, jak v Ruby vytvořit řetězec. Vzhledem k potřebám této práce, zde ale nebudou představeny. Jedná se o řetězce, které začínají speciálními znaky %Q, %q a řetězec typu here documents. Více podrobností lze nalézt v [[Thomas2004, str. 58]](/diplomova-prace/pouzita-literatura#sections). Zde byly představeny pouze dva hlavní a nejobvyklejší způsoby tvorby řetězců.
+
+###Symboly
+
+Datový typ Symbol, který je reprezentován stejnojmenou třídou, se nedá přirovnat k žádnému datovému typu, který se nachází v Javě. Jedná se o unikátnost Ruby. Podobný datový typ můžeme nalézt například v jazycích LISP nebo Elrang, ale mezi nejznámnějšími jazyky bychom hledali zbytečně. Nejjednodušeji řečeno, slovy programátora, který vystupuje pod přezdívkou Why<sup>3</sup>: *„Symboly jsou odlehčené řetězce“* [[Why2005]](/diplomova-prace/pouzita-literatura#sections). Jedná se o konstrukci, která je hlavně mezi začátečníky v Ruby špatně chápána a proto bude lepší ji hned ukázat na příkladu:
+
+#start#
+output = :html
+if output == :html
+  # process it like html
+else
+  # process it another way
+end
+#stop#
+
+
+Příklad představuje situaci, ve které se v programu rozhoduje, jakým způsobem bude zpracován výstup z aplikace. To jakým způsobem bude výstup zpracován, určuje proměnná output, která obsahuje název výstupu. V tomto konkrétním příkladu proměnná output obsahuje symbol html a výstup by byl tedy zpracován jako html. Jak můžeme vidět, symboly se vytvářejí jako literály, které se skládají z dvojtečky a názvu symbolu. Stejného výsledku by bylo možné dosáhnout, kdyby se na místo symbolu použil řetězec:
+
+#start#
+output = 'html'
+if output == 'html'
+  # process it like html
+else
+  # process it another way
+end
+#stop#
+
+
+Oba výše uvedené příklady by bezesporu fungovaly správně a z hlediska logiky programu v nich není žádný rozdíl. Určité rozdíly tu ale přesto existují. Prvním rozdílem je rychlost zpracování. Pokaždé, když je někde v programu použit symbol, tak se tento symbol uloží do speciální tabulky k ostatním symbolům. Když je pak stejný symbol použit na jiném místě v programu, nevytváří se nový objekt, ale je použit již dříve vytvořený symbol. Oproti tomu, když v aplikaci použijeme řetězec, tak ten je vždy vytvářen znovu (vždy se vytváří nová instance). Každý objekt má v Ruby své jednoznačné identifikační číslo. To, že se u řetězců vytváří vždy nová instance a u symbolů nikoliv, tak můžeme demonstrovat na následujícím příkladu:
+
+#start#
+puts :this_is_symbol.object_id #=> 333224
+puts :this_is_symbol.object_id #=> 333224
+puts 'this_is_string'.object_id #=> 15760920
+puts 'this_is_string'.object_id #=> 15009312
+#stop#
+
+
+Kromě toho, že jsou symboly oproti řetězcům rychleji zpracovány, má jejich využití také sémantický význam. Jejich využití má smysl v případech, kdy bychom například v Javě použili řetězec, ale přitom bychom tento řetězec nechtěli nikam vypisovat. Typickým případem je příklad výše, ve kterém se rozhoduje, jakým způsobem bude zpracován výstup z hypotetické aplikace. Řetězec by zde sloužil pouze jako argument pro rozhodování, ale nikam by se nevypisoval. Toto je tedy vhodný případ pro použití symbolu. Ve velké míře se symboly využívají jako klíče v asociativních polích, jak bude ukázáno v kapitole 2.9.5 Asociativní pole.
+
+###Pole
+
+Datový typ pole existuje i v jazyku Java, avšak Ruby tento datový typ implementuje v některých případech trochu odlišně. Pole, které je reprezentováno instancí třídy Array, v sobě uchovává reference na objekty, které jsou v poli obsažené. Každý prvek pole tedy představuje odkaz na nějaký objekt. Pořadí prvků v poli je pevně dané a k jednotlivým prvkům se přistupuje pomocí indexu. Počáteční prvek pole má index nula.
+
+#start#
+my_array = [ 'string', 3.14, :symbol ]
+my_array[0] #=> 'string'
+my_array[1] #=> 3.14
+my_array[2] #=> :symbol
+my_array[3] #=> nil
+#stop#
+
+
+Na prvním řádku můžeme vidět, jak lze v Ruby vytvořit pole pomocí literálu a zároveň to, že do pole můžeme vkládat prvky, které jsou různého datového typu. Pole lze samozřejmě vytvořit i pomocí klasického kontruktoru, který nabízí třída Array. Zápis by pak vypadal takto my_array = Array.new(). Na dalších řádcích příkladu, pak již můžeme vidět, jak lze k jednotlivým prvkům pole přistupovat pomocí metody [], které jako argument poskytneme index příslušného prvku. Pokud pole neobsahuje prvek s daným indexem, je vrácena hodnota nil. Metoda [], která slouží pro získání jednotlivých prvků z pole, má i svůj ekvivalent []=, který slouží naopak pro zápis:
+
+#start#
+my_favorite_animals = []
+my_favorite_animals[0] = 'dog'
+my_favorite_animals[1] = 'kangaroo'
+my_favorite_animals[3] = 'Donald Duck'
+my_favorite_animals #=> ["dog", "kangaroo", nil, "Donald Duck"]
+#stop#
+
+
+Nejdříve jsme si vytvořili prázdné pole, do kterého jsme poté pomocí metody []= a indexů přidali jednotlivé položky. Jak je vidět na výpisu pole, který je na posledním řádku, indexy nemusí jít popořadě. Na místo prázdných položek pole se jednoduše dosadil objekt nil.
+Může to vypadat, že pro manipulaci s polem se neobejdeme bez indexů, ale není tomu tak. Indexy se používají pouze tehdy, pokud známe index prvku, se kterým chceme manipulovat. Chceme-li například přidat další prvek na konec pole, index k tomu znát nepotřebujeme. Pro přidání prvků nakonec pole slouží metoda <<, která je důkazem toho, jak se snaží být Ruby názorné. Znaky menšítek tvoří pomyslnou šipku, která znázorňuje, co se kam bude přidávat. Předchozí příklad by tak šel zapsat takto:
+
+#start#
+my_favorite_animals = []
+my_favorite_animals << 'dog'
+my_favorite_animals << 'kangaroo'
+my_favorite_animals << nil
+my_favorite_animals << 'Donald Duck'
+my_favorite_animals #=> ["dog", "kangaroo", nil, "Donald Duck"]
+#stop#
+
+###Asociatiovní pole
+
+Asociativní pole můžeme v literatuře nebo odborných článcích nalézt i pod označením mapy nebo slovníky. V Ruby je asociativní pole implementováno pomocí třídy Hash. Pole a asociativní pole toho mají společného více, než by se mohlo na první pohled zdát. Pole je množina uspořádaných odkazů na objekty, kde se k jednotlivým prvkům pole přistupuje pomocí indexů. Hlavní odlišnost asociativního pole od klasického pole je, že index, který se používá pro přístup k jednotlivým prvkům, nemusí být číslo, ale může to být libovolný objekt. Prvky asociativního pole jsou tak vždy tvořeny samotnou hodnotou a pak tzv. klíčem, který představuje jednoznačný identifikátor daného prvku. Klíčem v asociativním poli může být libovolný objekt, který musí splňovat pouze jednu podmínku. Každý klíč musí být v rámci jednoho asociativního pole unikátní, tak aby mohl tvořit jednoznačný identifikátor.
+
+V Javě se implementaci asociativního pole, tak jak je v Ruby, asi nejvíce přibližuje třída HashMap. Důležitou změnu oproti klasickým představám o asociativním poli přináši verze Ruby 1.9.1. Od této verze si prvky v asociativním poli drží pevné pořadí. To znamená, že prvky jsou uchovávány ve stejném pořadí, ve kterém byly do asociativního pole přidány. Ve všech dřívejších verzích Ruby platilo, že prvky asociativního pole byly ukládány v náhodném pořadí. Asociativní pole se tak ještě více přibližuje poli, které je implementováno pomocí třídy Array.
+
+Nejjednodušším způsobem, jak lze v Ruby vytvořit asociativní pole, je stejně jako u klasického pole, pomocí literálu:
+
+#start#
+personal_info = { :name => 'Tomáš Porazil', :sex => 'male' }
+#stop#
+
+
+Literál je tvořen složenými závorkami, ve kterých se nachází jednotlivé prvky asociativního pole. Prvky jsou vždy tvořeny dvojicí klíč a hodnota a jsou odděleny symbolem =>. Jednotlivé prvky jsou pak od sebe odděleny čárkou. V příkladu uvedeném výše jsou jako klíče zvoleny symboly a hodnotami jsou řetězce.
+
+Stejně jako v případě obyčejného pole, tak i u asociativního pole lze pro zápis využít metodu []= a pro čtení naopak metodu []. Jediným rozdílem je, že namísto indexů se jako identifikátor prvků použije jejich klíč. Pokud prvek s námi poskytnutým klíčem neexistuje, je vrácena hodnota nil.
+
+#start#
+currencies = {}
+currencies[:czech_republic] = 'Czech Crown'
+currencies[:france] = 'Euro'
+currencies[:croatia] = 'Kuna'
+currencies[:denmark] = 'Danish Krone' 
+puts currencies[:czech_republic] #=> Czech Crown
+#stop#
+
+###Intervaly, posloupnosti
+
+Intervaly nebo sekvence jsou objekty, které můžeme v realitě běžně pozorovat kolem sebe. Kalendářní rok se například skládá z řady po sobě jdoucích měsíců, abeceda z řady po sobě jdoucích znaků a asi nejpřirozenější jsou pro nás intervaly číselné. Pro lepší ztvárnění reality Ruby obsahuje datový typ Range, který nám právě tyto intervaly pomáhá zachytit. Datový typ Range má v Ruby tři základní využití. Používá se k implementaci posloupností, jako přepínač v podmínkách a jako interval.
+
+####Interval jako posloupnost
+
+Posloupnosti jsou charakterisické tím, že mají definován počáteční a koncový bod. Každý prvek v posloupnosti zná svého předchůdce a následovníka, pakliže oba existují. Jinými slovy, je posloupnost množina ordinálních prvků. Posloupnosti lze v Ruby zapsat dvěma různými způsoby, přičemž oba mají trošku jiný význam:
+
+#start#
+# pozn. metoda to_a znamená "to array" a převádí daný objekt na pole
+1..10 # (1..10).to_a #=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+1...10 # (1...10).to_a #=> [1, 2, 3, 4, 5, 6, 7, 8, 9]
+#stop#
+
+
+První způsob (pomocí dvou teček) vytvoří posloupnost, která v sobě zahrnuje všechny prvky včetně počátečního a koncového bodu. Druhý zápis (pomocí tří teček) vytvoří instanci třídy Range, která neobsahuje koncový bod. V definici rozsahu se nemusí nacházet pouze čísla, ale mohou se vytvořit i posloupnosti znaků, nebo dokonce řetězců. Problémem je, že Ruby tvoří sekvence znaků pouze na základě anglické abecedy:
+
+#start#
+ ('a'..'h').to_a #=> ["a", "b", "c", "d", "e", "f", "g", "h"]
+('car'..'cat').to_a #=> ["car", "cas", "cat"]
+#stop#
+
+
+Kromě tvoření sekvencí ze znaků, řetězců a čísel lze tvořit sekvence i z uživatelsky vytvořených objektů. Pro vytvoření rozsahu z uživatelsky definovaných objektů musí objekt splňovat pár následujících podmínek. Objekt musí implementovat dvě metody:
+
+* Metodu succ, která vrátí následující objekt.
+* Metodu <=>, která slouží pro porovnání dvou objektů. Tato metoda vrací hodnoty -1, 0, 1 v závislosti na tom, zda je první objekt nižší, roven nebo vyšší. 
+
+Velice umělým příkladem ukázky definování vlastní třídy, kterou lze použít jako posloupnost, může být níže uvedená třída Month, která umožňuje vytváření posloupností měsíců kalendářního roku:
+
+#start#
+class Month    
+  VERBAL_MONTH = {
+    1 => "January", 2 => "February",
+    3 => "March", 4 => "April", 5 => "May", 6 => "June",
+    7 => "July", 8 => "August", 9 => "September",
+    10 => "October", 11 => "November", 12 => "December" 
+  }
+  
+  attr :month
+  
+  def initialize month
+    @month = month
+  end
+  
+  def verbalise
+    VERBAL_MONTH[@month]
+  end
+  
+  def <=> other
+    @month <=> other.month
+  end
+  
+  def succ
+    raise(IndexError, "Year has only 12 month") if @month >= 12
+    Month.new(@month.succ)
+  end
+end
+#stop#
+
+
+Použití této třídy by pak mohlo být například následujícím způsobem, kdy bychom chtěli definovat interval měsíců, ve kterých jsou prázdniny:
+
+#start#
+holidays = Month.new(7)..Month.new(8)
+holidays.each { |month| puts month.verbalise } #=> Jully August
+#stop#
+
+
+####Interval jako podmínka
+
+Interval lze použít i jako podmínku. Nejedná se však o obyčejnou podmínku, ve které by se jednoduše vyhodnocovalo, zda je daný výraz pravdivý či ne. Interval má v podmínce úlohu přepínače. Podmínka se stane pravdivou, jakmile výraz vyhovuje počátečnímu bodu intervalu. Od této chvíle je výraz vždy vyhodnocen jako pravdivý, až do doby, kdy výraz vyhovuje koncovému bodu intervalu a pomyslný přepínač se opět přepne do negativního stavu. Popsané chování demonstruje následující příklad:
+
+#start#
+["dog", "cow", "bird", "horse", "cat"].each do |animal|
+  if (animal == "cow")..(animal == "horse")
+    print(animal, " ")
+  end
+end 
+#=> cow bird horse
+#stop#
+
+
+Postupně se prochází prvky pole a nic se nevypisuje, protože podmínka je vyhodnocena jako nesplněná až do doby, kdy se proměnná animal rovná řetězci cow. V tuto chvíli se sepne spínač a opět se vypne až v momentě, kdy se proměnná animal rovná řetězci horse.
+
+####Interval
+
+Poslední využití instance třídy Range je v podobě intervalu. Pro zjištění zda se daný objekt nachází uvnitř intervalu, slouží operátor ===, který vrací jednoduše true, pokud interval hodnotu obsahuje a false pokud nikoliv. Použití tohoto operátoru je velice jednoduché, jak ukazuje příklad, ve kterém se snažíme zjistit, zda je daný prvek obsažen v intervalu:
+
+#start#
+(1..10) === 5 #=> true
+(1..10) === 11 #=> false
+('a'..'d') === 'c' #=> true
+('a'..'d') === 'e' #=> false
+#stop#
+
+
+Velice časté využití rozsahu jako intervalu je při větvení pomocí příkazu case, ve kterém interval slouží jako návěstí. Zde je také využit operátor === pro zjištění, zda se daný prvek v intervalu nachází, je ale použit skrytě. Jeho použití je při porovnávání hodnoty a intervalu, který je v návěstí:
+
+#start#
+def verbalise_age age
+  case age
+    when 0..1: "baby"
+    when 2..3: "toddler"
+    when 4..12: "child"
+    when 13..18: "adolescent"
+    when 19..65: "adult"
+    when 65..99: "old"
+    when 99..130: "very old"
+    else "death"
+  end
+end
+puts "You are #{verbalise_age(5)}." #=> You are child.
+puts "You are #{verbalise_age(25)}." #=> You are adult.
+puts "You are #{verbalise_age(75)}." #=> You are old.
+#stop#
+
+###Regulární výrazy
+
+Regulární výrazy nejsou charakteristickým představitelem standardních datových typů, pokud se jedná o klasické (nejpoužívanější) programovací jazyky. Mezi základní datové typy patří řetězce (String), celá čísla (Integer), desetinná čísla (Float), pole (Array), nebo třeba asociativní pole (Hash) a ještě některé další. Regulární výrazy bychom mezi základními datovými typy marně hledali i v Javě. Vyjímku tvoří jazyk Ruby a pak také například Perl, nebo awk [Thomas2004]. Tyto jazyky si uvědomují (resp. jejich tvůrci), že i když jsou regulární výrazy pro většinu programátorů spíše kryptografické než samovysvětlující, jejich síla je natolik velká, že se je vyplatí zařadit bok po boku klasických datových typů.
+
+Regulární výrazy se obecně používají k prohledávání textů (řetězců). Na základě definovaného vzoru (regulárního výrazu) se prohledává daný text a hledá se shoda. Ve vzorech se nepoužívá pouze lineární text, ale využívá se speciální syntaxe, pomocí které lze definovat například opakování znaků nebo celých slov, zda se má jednat o znaky nebo o čísla, nebo zda se má jednat například o netisknutelné znaky. Regulární výrazy tak představují svůj vlastní jazyk, který je definován v jiném jazyku. Výhodou je, že se syntaxe regulárních výrazů v jednotlivých programovacích jazycích příliš neliší a ve většině případů se respektují stejná syntaktická pravidla. Podrobná publikace, která do detailu popisuje regulární výrazy je například [Friedl2006] a detailní popis, který je přímo svázán s Ruby lze nalézt v [Thomas2004]. V této části věnované regulárním výrazům v Ruby si pouze krátce představíme jejich tvorbu, důležité operátory, metody a třídy, které se k nim úzce váží.
+
+Stejně jako řetězce i regulární výrazy můžeme v Ruby tvořit dvěma způsoby. První způsob je pomocí literálu, kdy příslušný výraz umístíme mezi lomítka a výraz má pak následující podobu /výraz/, nebo pomocí speciálního znaku %r a složených závorek a výraz pak vypadá takto %r{výraz}. Protože v Ruby je všechno objekt, tak regulární výraz můžeme vytvořit i klasickou cestou za pomoci konstruktoru. Regulární výrazy jsou instancemi třídy Regexp. Všechny tři následující způsoby tvorby regulárního výrazu jsou ekvivalentní:
+
+#start#
+regexp = Regexp.new('ruby')
+regexp = /ruby/
+regexp = %r{ruby}
+#stop#
+
+
+Pro zjištění shody regulárního výrazu s řetězcem existuje na výběr několik možností. Shodu lze zjistit buďto pomocí operátorů =~ (existuje shoda), !~ (neexistuje shoda) nebo pomocí metody instance Regexp#match, kterou poskytuje regulární výraz. Při rozhodování o tom, jakou metodu využít, je rozhodující, s jakým výsledkem se nám bude lépe pracovat. Operátor =~, který hledá shodu, vrací jako výsledek pozici prvního znaku v řetězci, kde byla nalezena shoda. V případě, že žádná shoda nalezena nebyla, je vrácena hodnota false. Operátor !~ se používá pro zjištění, zda řetězec naopak neobsahuje hledaný výraz. Výsledek příkazu je true, pokud výraz v řetězci obsažen není a false, pokud ano. Pokud chceme komplexnější výsledek, můžeme využít metodu match, která vrací instanci třídy MatchData, pokud byla nalezena shoda a false pokud nikoliv. Instance třídy MatchData poskytuje informace o celém zkoumaném řetězci. Výše popsané způsoby práce s regulárními výrazy jsou vidět na následujících příkladech:
+
+#start#
+regexp = /Ruby/
+regexp =~ 'Do you know Ruby the best programming language?' #=> 12
+regexp !~ 'Do you know Ruby the best programming language?' #=> false
+regexp !~ 'Do you know Python programming language?' #=> true
+regexp.match('Do you know Ruby the best programming language?')
+#=> <#MatchData "Ruby">
+#stop#
+
+
+<hr />
+
+<sup>1</sup> To zda bude tento rozsah -2<sup>30</sup> do 2<sup>30</sup> - 1 nebo -2<sup>62</sup> do 2<sup>62</sup> - 1 je určeno architekturou počítače, která může být buď 32 bitová nebo 64 bitová.
+
+<sup>2</sup> Mezery se pro lepší čitelnost čísel používají v našem kulturním prostředí. Podtržítkem můžeme nahradit samozřejmě i jakýkoliv jiný oddělovač.
+
+<sup>3</sup> Celá přezdívka zní *Why the lucky stiff* a zkráceně se používá právě jako *Why* nebo také *_why*. Jedná se o jednu z nejznámnějších osob Ruby komunity, ale jeho pravá identita nikdy nebyla odhalena. Why je mimo jiné autorem jedné z nejoriginálnější učebnic Ruby [[Why2005]](/diplomova-prace/pouzita-literatura#sections).

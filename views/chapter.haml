@@ -1,0 +1,20 @@
+%h1.motto
+  Programovací jazyk <strong>Ruby</strong> a jeho <strong>účelnost</strong> zařazení do výuky.
+#sections
+  .section{ :class => "grid_4 suffix_1 first" }
+    %h2
+      Obsah
+    .thesis-menu
+      =list_thesis_menu
+  .section{ :class => "grid_9 last" }
+    %h2
+      =@chapter.numbered_name
+    .navigation
+      =previous_chapter_link(@chapter)
+      =next_chapter_link(@chapter)
+    .chapter-content
+      :markdown
+        #{@chapter.content}
+    .navigation
+      =previous_chapter_link(@chapter)
+      =next_chapter_link(@chapter)
